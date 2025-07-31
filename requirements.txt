@@ -1,0 +1,7 @@
+typer
+sqlalchemy
+requests
+python-dotenv
+mlbstatsapi
+nginx
+tabulate
