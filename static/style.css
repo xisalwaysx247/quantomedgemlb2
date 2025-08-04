@@ -1513,3 +1513,967 @@ footer {
         gap: 0.3rem;
     }
 }
+
+/* Player Stats Styles */
+.player-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.page-title {
+    color: var(--accent);
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 20px var(--accent);
+}
+
+.player-meta {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.team-badge, .position-badge, .tier-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.team-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    color: var(--bg);
+}
+
+.position-badge {
+    background: linear-gradient(135deg, var(--warning), #FFA500);
+    color: var(--bg);
+}
+
+.tier-badge {
+    color: var(--text);
+}
+
+.tier-badge.strong {
+    background: linear-gradient(135deg, var(--strong), #00CC6A);
+}
+
+.tier-badge.bubble {
+    background: linear-gradient(135deg, var(--bubble), #FFD700);
+    color: var(--bg);
+}
+
+.tier-badge.weak {
+    background: linear-gradient(135deg, var(--danger), #CC0055);
+}
+
+.player-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.stats-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 227, 255, 0.15);
+    border-color: var(--accent);
+}
+
+.card-title {
+    color: var(--accent);
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-align: center;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 0.5rem;
+}
+
+.stats-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.stats-table td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.95rem;
+}
+
+.stats-table td:first-child {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.stat-value {
+    color: var(--text);
+    font-weight: 700;
+    text-align: right;
+    font-family: 'Monaco', 'Menlo', monospace;
+}
+
+.stat-value.highlight {
+    color: var(--accent);
+    text-shadow: 0 0 8px var(--accent);
+}
+
+.streak-alert {
+    background: linear-gradient(135deg, var(--strong), #00CC6A);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--bg);
+    box-shadow: 0 4px 15px rgba(0, 255, 135, 0.3);
+}
+
+.streak-icon {
+    font-size: 3rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.streak-content h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+}
+
+.recent-games {
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    color: var(--accent);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.games-table {
+    width: 100%;
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    border-collapse: collapse;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.games-table th {
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    color: var(--bg);
+    padding: 1rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.games-table td {
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+
+.games-table tr:hover {
+    background: var(--bg-hover);
+}
+
+.result.win {
+    color: var(--strong);
+    font-weight: 700;
+}
+
+.result.loss {
+    color: var(--danger);
+    font-weight: 700;
+}
+
+.player-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    color: var(--bg);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 227, 255, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, var(--text-muted), var(--text-dim));
+    color: var(--bg);
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(179, 185, 196, 0.4);
+}
+
+.error-message {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.error-message h1 {
+    color: var(--danger);
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.error-message p {
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.error-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* Responsive Design for Player Pages */
+@media (max-width: 768px) {
+    .player-container {
+        padding: 1rem;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .player-stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .stats-card {
+        padding: 1rem;
+    }
+    
+    .player-meta {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .player-actions {
+        flex-direction: column;
+    }
+    
+    .games-table {
+        font-size: 0.8rem;
+    }
+    
+    .games-table th,
+    .games-table td {
+        padding: 0.5rem;
+    }
+}
+
+/* Pick Tank Styles */
+.pick-tank-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.date-navigation {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+}
+
+.date-navigation .btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.date-navigation .btn-secondary {
+    background: linear-gradient(135deg, var(--text-muted), var(--text-dim));
+    color: var(--bg);
+    border-color: var(--text-muted);
+}
+
+.date-navigation .btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(179, 185, 196, 0.3);
+    border-color: var(--accent);
+}
+
+.date-navigation .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    color: var(--bg);
+    border-color: var(--accent);
+}
+
+.date-navigation .btn-primary:hover:not(.disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 227, 255, 0.3);
+}
+
+.date-navigation .btn-primary.disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.date-notice {
+    text-align: center;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    margin: 1rem 0 2rem 0;
+    font-size: 1.1rem;
+}
+
+.date-notice.fresh-day {
+    background: linear-gradient(135deg, rgba(0, 255, 135, 0.1), rgba(0, 255, 135, 0.05));
+    border: 2px solid var(--strong);
+    color: var(--strong);
+}
+
+.date-notice:not(.fresh-day) {
+    background: linear-gradient(135deg, rgba(0, 227, 255, 0.1), rgba(0, 227, 255, 0.05));
+    border: 2px solid var(--accent);
+    color: var(--accent);
+}
+
+.games-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.game-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.game-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 227, 255, 0.15);
+    border-color: var(--accent);
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.game-title {
+    color: var(--accent);
+    font-size: 1.4rem;
+    margin: 0;
+    text-shadow: 0 0 10px var(--accent);
+}
+
+.game-meta {
+    margin-top: 0.5rem;
+}
+
+.game-status {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.game-status.scheduled {
+    background: linear-gradient(135deg, var(--warning), #FFA500);
+    color: var(--bg);
+}
+
+.game-status.live {
+    background: linear-gradient(135deg, var(--strong), #00CC6A);
+    color: var(--bg);
+    animation: pulse 2s infinite;
+}
+
+.picks-section {
+    margin-top: 2rem;
+}
+
+.picks-title {
+    color: var(--strong);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--strong);
+    padding-bottom: 0.5rem;
+}
+
+.picks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.pick {
+    background: rgba(42, 42, 42, 0.5);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    border-left: 4px solid var(--accent);
+}
+
+.pick-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.pick-stars {
+    display: flex;
+    gap: 0.2rem;
+}
+
+.star {
+    color: var(--warning);
+    text-shadow: 0 0 5px var(--warning);
+}
+
+.type-badge {
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.type-badge.team {
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    color: var(--bg);
+}
+
+.type-badge.player {
+    background: linear-gradient(135deg, var(--strong), #00CC6A);
+    color: var(--bg);
+}
+
+.pick-time {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-family: 'Monaco', 'Menlo', monospace;
+}
+
+.pick-content {
+    color: var(--text);
+}
+
+.pick-main {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+}
+
+.pick-market {
+    background: rgba(0, 227, 255, 0.1);
+    color: var(--accent);
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.pick-separator {
+    color: var(--text-muted);
+    font-weight: bold;
+}
+
+.pick-selection {
+    background: rgba(0, 255, 135, 0.1);
+    color: var(--strong);
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.pick-odds {
+    color: var(--warning);
+    font-weight: 600;
+    font-family: 'Monaco', 'Menlo', monospace;
+}
+
+.pick-comment {
+    color: var(--text-muted);
+    font-style: italic;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    border-left: 3px solid var(--text-muted);
+}
+
+.no-picks {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(255, 0, 110, 0.05);
+    border: 2px dashed var(--danger);
+    border-radius: 12px;
+    margin-top: 1.5rem;
+}
+
+.no-picks-text {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+.inline-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.inline-link:hover {
+    text-decoration: underline;
+    text-shadow: 0 0 5px var(--accent);
+}
+
+.no-games-message {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+}
+
+/* Responsive Pick Tank */
+@media (max-width: 768px) {
+    .pick-tank-container {
+        padding: 1rem;
+    }
+    
+    .date-navigation {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .game-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .pick-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .pick-main {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+}
+
+/* Player Page Styles */
+.player-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-hover) 100%);
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    padding: 2rem;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    text-shadow: 0 0 20px var(--accent);
+}
+
+.player-meta {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.team-badge, .position-badge, .tier-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.team-badge {
+    background: var(--accent);
+    color: var(--bg);
+}
+
+.position-badge {
+    background: var(--warning);
+    color: var(--bg);
+}
+
+.tier-badge {
+    border: 2px solid;
+}
+
+.tier-badge.strong {
+    background: var(--success);
+    border-color: var(--success);
+    color: var(--bg);
+}
+
+.tier-badge.bubble {
+    background: var(--warning);
+    border-color: var(--warning);
+    color: var(--bg);
+}
+
+.tier-badge.weak {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: var(--text);
+}
+
+/* Player Stats Grid */
+.player-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.stats-card {
+    background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-hover) 100%);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 8px 25px rgba(0, 227, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.card-title {
+    background: var(--accent);
+    color: var(--bg);
+    padding: 1rem;
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.stats-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.stats-table tbody tr {
+    border-bottom: 1px solid var(--border);
+}
+
+.stats-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.stats-table tbody tr:hover {
+    background: rgba(0, 227, 255, 0.05);
+}
+
+.stats-table td {
+    padding: 0.8rem 1rem;
+    border: none;
+}
+
+.stats-table td:first-child {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.stat-value {
+    text-align: right;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.stat-value.highlight {
+    color: var(--accent);
+    font-size: 1.1rem;
+    text-shadow: 0 0 10px var(--accent);
+}
+
+/* Streak Alert */
+.streak-alert {
+    background: linear-gradient(135deg, var(--success) 0%, #00cc6a 100%);
+    color: var(--bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 8px 25px rgba(0, 255, 135, 0.2);
+}
+
+.streak-icon {
+    font-size: 2rem;
+    animation: fire 1s ease-in-out infinite alternate;
+}
+
+@keyframes fire {
+    0% { transform: scale(1) rotate(-2deg); }
+    100% { transform: scale(1.1) rotate(2deg); }
+}
+
+.streak-content h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.3rem;
+}
+
+.streak-content p {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Recent Games Table */
+.recent-games {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+    text-align: center;
+}
+
+.games-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-hover);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.games-table th {
+    background: var(--accent);
+    color: var(--bg);
+    padding: 1rem 0.8rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.games-table td {
+    padding: 0.8rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+
+.games-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.games-table tbody tr:hover {
+    background: rgba(0, 227, 255, 0.1);
+}
+
+.result.win {
+    color: var(--success);
+    font-weight: 700;
+}
+
+.result.loss {
+    color: var(--danger);
+    font-weight: 700;
+}
+
+/* Player Actions */
+.player-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 3rem;
+}
+
+.btn {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 227, 255, 0.3);
+}
+
+.btn-secondary {
+    background: var(--bg-hover);
+    color: var(--text);
+    border: 2px solid var(--border);
+}
+
+.btn-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+}
+
+/* Error Message */
+.error-message {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--bg-card);
+    border: 2px solid var(--danger);
+    border-radius: 12px;
+    margin: 2rem;
+}
+
+.error-message h1 {
+    color: var(--danger);
+    margin-bottom: 1rem;
+}
+
+.error-message p {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+}
+
+.error-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .player-container {
+        padding: 1rem;
+    }
+    
+    .page-header {
+        padding: 1.5rem;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .player-meta {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .player-stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .games-table {
+        font-size: 0.9rem;
+    }
+    
+    .games-table th,
+    .games-table td {
+        padding: 0.6rem 0.4rem;
+    }
+    
+    .player-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn {
+        padding: 0.8rem 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .player-stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-table td {
+        padding: 0.6rem 0.8rem;
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+    }
+}

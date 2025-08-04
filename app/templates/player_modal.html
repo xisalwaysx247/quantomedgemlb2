@@ -153,6 +153,17 @@
     font-weight: bold;
 }
 
+.stat-group-header {
+    color: #00ff88;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin: 15px 0 10px 0;
+    padding: 8px 12px;
+    background: rgba(0, 255, 136, 0.1);
+    border-left: 3px solid #00ff88;
+    border-radius: 4px;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     .modal-content {
@@ -234,74 +245,202 @@ function populatePlayerStats(playerData) {
     
     const stats = playerData.stats;
     
-    // Batting statistics
-    const battingFields = [
-        { key: 'gamesPlayed', label: 'Games Played' },
-        { key: 'atBats', label: 'At Bats' },
-        { key: 'hits', label: 'Hits' },
-        { key: 'avg', label: 'Batting Average' },
-        { key: 'runs', label: 'Runs' },
-        { key: 'doubles', label: 'Doubles' },
-        { key: 'triples', label: 'Triples' },
-        { key: 'homeRuns', label: 'Home Runs' },
-        { key: 'rbi', label: 'RBI' },
-        { key: 'obp', label: 'On Base %' },
-        { key: 'slg', label: 'Slugging %' },
-        { key: 'ops', label: 'OPS' },
-        { key: 'strikeOuts', label: 'Strikeouts' },
-        { key: 'baseOnBalls', label: 'Walks' },
-        { key: 'stolenBases', label: 'Stolen Bases' },
-        { key: 'caughtStealing', label: 'Caught Stealing' }
+    // Determine if player is primarily a hitter or pitcher
+    const isHitter = stats.atBats && stats.atBats > 0;
+    const isPitcher = stats.gamesPitched && stats.gamesPitched > 0;
+    
+    // Show/hide sections based on player type
+    const battingSection = battingStats.closest('.stats-section');
+    const pitchingSection = pitchingStats.closest('.stats-section');
+    const fieldingSection = fieldingStats.closest('.stats-section');
+    
+    // Define hitting-specific stats
+    const hittingKeys = [
+        'gamesPlayed', 'atBats', 'plateAppearances', 'hits', 'avg', 'obp', 'slg', 'ops', 'babip',
+        'runs', 'doubles', 'triples', 'homeRuns', 'rbi', 'totalBases', 'atBatsPerHomeRun',
+        'strikeOuts', 'baseOnBalls', 'intentionalWalks', 'hitByPitch', 'numberOfPitches',
+        'stolenBases', 'caughtStealing', 'stolenBasePercentage', 'leftOnBase', 
+        'groundIntoDoublePlay', 'sacFlies', 'sacBunts', 'groundOuts', 'airOuts', 
+        'groundOutsToAirouts', 'catchersInterference'
     ];
     
-    battingFields.forEach(field => {
-        if (stats.hasOwnProperty(field.key) && stats[field.key] !== undefined) {
-            const statItem = createStatItem(field.label, stats[field.key]);
-            battingStats.appendChild(statItem);
-        }
-    });
-    
-    // Pitching statistics
-    const pitchingFields = [
-        { key: 'gamesPitched', label: 'Games Pitched' },
-        { key: 'gamesStarted', label: 'Games Started' },
-        { key: 'inningsPitched', label: 'Innings Pitched' },
-        { key: 'wins', label: 'Wins' },
-        { key: 'losses', label: 'Losses' },
-        { key: 'era', label: 'ERA' },
-        { key: 'whip', label: 'WHIP' },
-        { key: 'saves', label: 'Saves' },
-        { key: 'holds', label: 'Holds' },
-        { key: 'earnedRuns', label: 'Earned Runs' },
-        { key: 'battersFaced', label: 'Batters Faced' },
-        { key: 'strikePercentage', label: 'Strike %' },
-        { key: 'pitchesPerInning', label: 'Pitches/Inning' }
+    // Define pitching-specific stats
+    const pitchingKeys = [
+        'gamesPitched', 'gamesStarted', 'gamesFinished', 'inningsPitched', 'era', 'whip',
+        'wins', 'losses', 'winPercentage', 'completeGames', 'shutouts', 'saves', 
+        'saveOpportunities', 'blownSaves', 'holds', 'inheritedRunners', 'inheritedRunnersScored',
+        'strikeOuts', 'strikeoutsPer9Inn', 'walksPer9Inn', 'strikeoutWalkRatio', 
+        'hitsPer9Inn', 'runsScoredPer9', 'homeRunsPer9', 'battersFaced', 'strikes', 
+        'strikePercentage', 'pitchesPerInning', 'outs', 'earnedRuns', 'baseOnBalls',
+        'intentionalWalks', 'hits', 'homeRuns', 'wildPitches', 'hitBatsmen', 'balks', 'pickoffs'
     ];
     
-    pitchingFields.forEach(field => {
-        if (stats.hasOwnProperty(field.key) && stats[field.key] !== undefined) {
-            const statItem = createStatItem(field.label, stats[field.key]);
-            pitchingStats.appendChild(statItem);
+    if (isHitter) {
+        battingSection.style.display = 'block';
+        
+        // Show ALL hitting-related stats from the JSON file
+        const hittingGroups = [
+            {
+                title: 'Primary Hitting Stats',
+                keys: ['gamesPlayed', 'atBats', 'plateAppearances', 'hits', 'avg', 'obp', 'slg', 'ops', 'babip']
+            },
+            {
+                title: 'Counting Stats',
+                keys: ['runs', 'doubles', 'triples', 'homeRuns', 'rbi', 'totalBases', 'atBatsPerHomeRun']
+            },
+            {
+                title: 'Plate Discipline',
+                keys: ['strikeOuts', 'baseOnBalls', 'intentionalWalks', 'hitByPitch', 'numberOfPitches']
+            },
+            {
+                title: 'Speed & Situational',
+                keys: ['stolenBases', 'caughtStealing', 'stolenBasePercentage', 'leftOnBase', 
+                       'groundIntoDoublePlay', 'sacFlies', 'sacBunts']
+            },
+            {
+                title: 'Contact Profile',
+                keys: ['groundOuts', 'airOuts', 'groundOutsToAirouts', 'catchersInterference']
+            }
+        ];
+        
+        hittingGroups.forEach(group => {
+            let hasGroupStats = false;
+            const groupStats = [];
+            
+            group.keys.forEach(key => {
+                if (stats.hasOwnProperty(key) && stats[key] !== undefined && stats[key] !== null) {
+                    hasGroupStats = true;
+                    groupStats.push({key, value: stats[key]});
+                }
+            });
+            
+            if (hasGroupStats) {
+                // Add group header
+                const groupHeader = document.createElement('div');
+                groupHeader.className = 'stat-group-header';
+                groupHeader.textContent = group.title;
+                battingStats.appendChild(groupHeader);
+                
+                // Add stats for this group
+                groupStats.forEach(stat => {
+                    const statItem = createStatItem(formatStatLabel(stat.key), stat.value);
+                    battingStats.appendChild(statItem);
+                });
+            }
+        });
+        
+        // Add any additional hitting stats not covered above
+        const additionalHittingStats = [];
+        Object.keys(stats).forEach(key => {
+            if (!hittingKeys.includes(key) && !pitchingKeys.includes(key) && 
+                key !== 'id' && key !== 'fullName' && key !== 'position') {
+                additionalHittingStats.push({key, value: stats[key]});
+            }
+        });
+        
+        if (additionalHittingStats.length > 0) {
+            const groupHeader = document.createElement('div');
+            groupHeader.className = 'stat-group-header';
+            groupHeader.textContent = 'Additional Stats';
+            battingStats.appendChild(groupHeader);
+            
+            additionalHittingStats.forEach(stat => {
+                const statItem = createStatItem(formatStatLabel(stat.key), stat.value);
+                battingStats.appendChild(statItem);
+            });
         }
-    });
+    } else {
+        battingSection.style.display = 'none';
+    }
     
-    // Fielding statistics
-    const fieldingFields = [
-        { key: 'groundOuts', label: 'Ground Outs' },
-        { key: 'airOuts', label: 'Air Outs' },
-        { key: 'groundOutsToAirouts', label: 'GO/AO Ratio' },
-        { key: 'totalBases', label: 'Total Bases' },
-        { key: 'hitByPitch', label: 'Hit By Pitch' },
-        { key: 'intentionalWalks', label: 'Intentional Walks' },
-        { key: 'groundIntoDoublePlay', label: 'Double Plays' }
-    ];
-    
-    fieldingFields.forEach(field => {
-        if (stats.hasOwnProperty(field.key) && stats[field.key] !== undefined) {
-            const statItem = createStatItem(field.label, stats[field.key]);
-            fieldingStats.appendChild(statItem);
+    if (isPitcher) {
+        pitchingSection.style.display = 'block';
+        
+        // Show ALL pitching-related stats from the JSON file
+        const pitchingGroups = [
+            {
+                title: 'Primary Pitching Stats',
+                keys: ['gamesPitched', 'gamesStarted', 'gamesFinished', 'inningsPitched', 'era', 'whip']
+            },
+            {
+                title: 'Wins & Decisions',
+                keys: ['wins', 'losses', 'winPercentage', 'completeGames', 'shutouts']
+            },
+            {
+                title: 'Saves & Relief',
+                keys: ['saves', 'saveOpportunities', 'blownSaves', 'holds', 'inheritedRunners', 'inheritedRunnersScored']
+            },
+            {
+                title: 'Strikeouts & Rate Stats',
+                keys: ['strikeOuts', 'strikeoutsPer9Inn', 'walksPer9Inn', 'strikeoutWalkRatio', 
+                       'hitsPer9Inn', 'runsScoredPer9', 'homeRunsPer9']
+            },
+            {
+                title: 'Control & Efficiency',
+                keys: ['battersFaced', 'strikes', 'strikePercentage', 'pitchesPerInning', 'outs']
+            },
+            {
+                title: 'Run Prevention',
+                keys: ['earnedRuns', 'baseOnBalls', 'intentionalWalks', 'hits', 'homeRuns']
+            },
+            {
+                title: 'Advanced Pitching',
+                keys: ['wildPitches', 'hitBatsmen', 'balks', 'pickoffs']
+            }
+        ];
+        
+        pitchingGroups.forEach(group => {
+            let hasGroupStats = false;
+            const groupStats = [];
+            
+            group.keys.forEach(key => {
+                if (stats.hasOwnProperty(key) && stats[key] !== undefined && stats[key] !== null) {
+                    hasGroupStats = true;
+                    groupStats.push({key, value: stats[key]});
+                }
+            });
+            
+            if (hasGroupStats) {
+                // Add group header
+                const groupHeader = document.createElement('div');
+                groupHeader.className = 'stat-group-header';
+                groupHeader.textContent = group.title;
+                pitchingStats.appendChild(groupHeader);
+                
+                // Add stats for this group
+                groupStats.forEach(stat => {
+                    const statItem = createStatItem(formatStatLabel(stat.key), stat.value);
+                    pitchingStats.appendChild(statItem);
+                });
+            }
+        });
+        
+        // Add any additional pitching stats not covered above
+        const additionalPitchingStats = [];
+        Object.keys(stats).forEach(key => {
+            if (!pitchingKeys.includes(key) && !hittingKeys.includes(key) && 
+                key !== 'id' && key !== 'fullName' && key !== 'position') {
+                additionalPitchingStats.push({key, value: stats[key]});
+            }
+        });
+        
+        if (additionalPitchingStats.length > 0) {
+            const groupHeader = document.createElement('div');
+            groupHeader.className = 'stat-group-header';
+            groupHeader.textContent = 'Additional Stats';
+            pitchingStats.appendChild(groupHeader);
+            
+            additionalPitchingStats.forEach(stat => {
+                const statItem = createStatItem(formatStatLabel(stat.key), stat.value);
+                pitchingStats.appendChild(statItem);
+            });
         }
-    });
+    } else {
+        pitchingSection.style.display = 'none';
+    }
+    
+    // Hide fielding section since we're focusing on hitting/pitching
+    fieldingSection.style.display = 'none';
 }
 
 function createStatItem(label, value) {
@@ -320,6 +459,73 @@ function createStatItem(label, value) {
     div.appendChild(valueSpan);
     
     return div;
+}
+
+function formatStatLabel(key) {
+    // Convert camelCase API keys to readable labels
+    const labelMap = {
+        'gamesPlayed': 'Games Played',
+        'atBats': 'At Bats',
+        'plateAppearances': 'Plate Appearances',
+        'avg': 'Batting Average',
+        'obp': 'On Base %',
+        'slg': 'Slugging %',
+        'ops': 'OPS',
+        'babip': 'BABIP',
+        'homeRuns': 'Home Runs',
+        'totalBases': 'Total Bases',
+        'atBatsPerHomeRun': 'AB per HR',
+        'strikeOuts': 'Strikeouts',
+        'baseOnBalls': 'Walks',
+        'intentionalWalks': 'Intentional Walks',
+        'hitByPitch': 'Hit By Pitch',
+        'numberOfPitches': 'Total Pitches',
+        'stolenBases': 'Stolen Bases',
+        'caughtStealing': 'Caught Stealing',
+        'stolenBasePercentage': 'SB Success %',
+        'leftOnBase': 'Left on Base',
+        'groundIntoDoublePlay': 'Ground into DP',
+        'sacFlies': 'Sacrifice Flies',
+        'sacBunts': 'Sacrifice Bunts',
+        'groundOuts': 'Ground Outs',
+        'airOuts': 'Air Outs',
+        'groundOutsToAirouts': 'GO/AO Ratio',
+        'catchersInterference': "Catcher's Interference",
+        'gamesPitched': 'Games Pitched',
+        'gamesStarted': 'Games Started',
+        'gamesFinished': 'Games Finished',
+        'inningsPitched': 'Innings Pitched',
+        'era': 'ERA',
+        'whip': 'WHIP',
+        'winPercentage': 'Win %',
+        'completeGames': 'Complete Games',
+        'saveOpportunities': 'Save Opportunities',
+        'blownSaves': 'Blown Saves',
+        'inheritedRunners': 'Inherited Runners',
+        'inheritedRunnersScored': 'Inherited Scored',
+        'strikeoutsPer9Inn': 'K/9',
+        'walksPer9Inn': 'BB/9',
+        'strikeoutWalkRatio': 'K/BB Ratio',
+        'hitsPer9Inn': 'Hits/9',
+        'runsScoredPer9': 'Runs/9',
+        'homeRunsPer9': 'HR/9',
+        'battersFaced': 'Batters Faced',
+        'strikePercentage': 'Strike %',
+        'pitchesPerInning': 'Pitches/Inning',
+        'earnedRuns': 'Earned Runs',
+        'wildPitches': 'Wild Pitches',
+        'hitBatsmen': 'Hit Batsmen',
+        'fullName': 'Player Name',
+        'rbi': 'RBI'
+    };
+    
+    // Return mapped label or convert camelCase to title case
+    if (labelMap[key]) {
+        return labelMap[key];
+    }
+    
+    // Convert camelCase to Title Case as fallback
+    return key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
 }
 
 // Close modal when clicking outside of it

@@ -50,6 +50,24 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Templates
 templates = Jinja2Templates(directory="app/templates")
 
+# Add custom Jinja2 filters for date manipulation
+from datetime import timedelta
+
+def as_datetime_filter(date_string):
+    """Convert date string to datetime object"""
+    try:
+        return datetime.strptime(date_string, "%Y-%m-%d")
+    except (ValueError, TypeError):
+        return datetime.now()
+
+def timedelta_filter(days):
+    """Create timedelta object"""
+    return timedelta(days=days)
+
+# Register the filters
+templates.env.filters['as_datetime'] = as_datetime_filter
+templates.env.globals['timedelta'] = timedelta
+
 def safe_format(value, decimals=3, default="N/A"):
     """Safely format numeric values for display"""
     if value is None or value == "N/A":
@@ -874,7 +892,7 @@ async def player_redirect(request: Request, player_id: int):
 # Pick Tank Routes
 @app.get("/pick-tank", response_class=HTMLResponse)
 async def pick_tank_index(request: Request, date: str = None):
-    """Pick Tank main page - shows today's games with existing picks"""
+    """Pick Tank main page - shows games for selected date with daily reset functionality"""
     if not date:
         date = datetime.now().strftime("%Y-%m-%d")
     
@@ -884,7 +902,9 @@ async def pick_tank_index(request: Request, date: str = None):
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
     
-    # Get today's games
+    logger.info(f"🎯 Pick Tank accessed for date: {date} (daily reset active)")
+    
+    # Get games for the specified date
     try:
         games = fetch_games_for_date(date, use_cache=True)
         if not games:
@@ -893,11 +913,25 @@ async def pick_tank_index(request: Request, date: str = None):
         logger.error(f"Error fetching games for pick tank: {e}")
         games = []
     
-    # Get existing picks for today's games
+    # Get existing picks for today's games - ONLY for the selected date
     db = next(get_db())
     try:
         game_pks = [game.get("gamePk") for game in games if game.get("gamePk")]
-        picks = db.query(Pick).filter(Pick.game_pk.in_(game_pks)).all() if game_pks else []
+        
+        if game_pks:
+            # Parse the date to create start and end of day timestamps
+            date_obj = datetime.strptime(date, "%Y-%m-%d")
+            start_of_day = date_obj.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_of_day = date_obj.replace(hour=23, minute=59, second=59, microsecond=999999)
+            
+            # Only get picks created on the selected date
+            picks = db.query(Pick).filter(
+                Pick.game_pk.in_(game_pks),
+                Pick.created_at >= start_of_day,
+                Pick.created_at <= end_of_day
+            ).all()
+        else:
+            picks = []
         
         # Group picks by game
         picks_by_game = {}
@@ -933,7 +967,8 @@ async def pick_tank_index(request: Request, date: str = None):
     return templates.TemplateResponse("pick_tank/index.html", {
         "request": request,
         "games": enhanced_games,
-        "date": date
+        "date": date,
+        "today_date": datetime.now().strftime("%Y-%m-%d")
     })
 
 @app.get("/pick-tank/new", response_class=HTMLResponse)
@@ -1059,7 +1094,8 @@ async def pick_tank_create_pick(
             selection=selection.strip(),
             odds=odds.strip() if odds else None,
             stars=stars,
-            comment=comment.strip() if comment else None
+            comment=comment.strip() if comment else None,
+            created_at=datetime.now()  # Ensure current timestamp for daily filtering
         )
         
         db.add(new_pick)
@@ -1090,6 +1126,45 @@ async def pick_tank_create_pick(
     
     # Redirect back to pick tank with anchor to the game
     return RedirectResponse(url=f"/pick-tank#game-{game_pk}", status_code=303)
+
+@app.get("/api/pick-tank/stats")
+async def pick_tank_stats(days: int = 7):
+    """API endpoint to show pick statistics for debugging - shows daily reset is working"""
+    db = next(get_db())
+    try:
+        from sqlalchemy import func, Date
+        
+        # Get pick counts by date for the last N days
+        stats = db.query(
+            func.date(Pick.created_at).label('date'),
+            func.count(Pick.id).label('pick_count')
+        ).filter(
+            Pick.created_at >= datetime.now() - timedelta(days=days)
+        ).group_by(
+            func.date(Pick.created_at)
+        ).order_by(
+            func.date(Pick.created_at).desc()
+        ).all()
+        
+        result = [
+            {
+                "date": stat.date.strftime("%Y-%m-%d") if stat.date else "Unknown",
+                "pick_count": stat.pick_count
+            }
+            for stat in stats
+        ]
+        
+        return {
+            "daily_reset_working": True,
+            "days_queried": days,
+            "pick_stats": result
+        }
+        
+    except Exception as e:
+        logger.error(f"Error fetching pick tank stats: {e}")
+        return {"error": str(e)}
+    finally:
+        db.close()
 
 if __name__ == "__main__":
     import uvicorn

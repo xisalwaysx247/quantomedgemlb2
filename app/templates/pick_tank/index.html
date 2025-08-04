@@ -7,8 +7,33 @@
     <div class="page-header">
         <h1 class="page-title">🎯 Pick Tank - {{ date }}</h1>
         <p class="page-description">
-            Your personal betting bulletin board. Attach picks to any game and track your analysis.
+            Your personal betting bulletin board. Each day starts fresh - attach picks to any game and track your analysis.
         </p>
+        
+        <!-- Date Navigation -->
+        <div class="date-navigation">
+            <a href="/pick-tank?date={{ (date | as_datetime - timedelta(days=1)).strftime('%Y-%m-%d') }}" 
+               class="btn btn-secondary">← Previous Day</a>
+            
+            {% if date != today_date %}
+            <a href="/pick-tank" class="btn btn-primary">📅 Today</a>
+            {% else %}
+            <span class="btn btn-primary disabled">📅 Today</span>
+            {% endif %}
+            
+            <a href="/pick-tank?date={{ (date | as_datetime + timedelta(days=1)).strftime('%Y-%m-%d') }}" 
+               class="btn btn-secondary">Next Day →</a>
+        </div>
+        
+        {% if date != today_date %}
+        <div class="date-notice">
+            <p>📋 Viewing picks for {{ date }}. Each day starts with a fresh Pick Tank.</p>
+        </div>
+        {% else %}
+        <div class="date-notice fresh-day">
+            <p>🌅 Today's fresh Pick Tank! No previous picks carry over.</p>
+        </div>
+        {% endif %}
     </div>
 
     {% if games %}

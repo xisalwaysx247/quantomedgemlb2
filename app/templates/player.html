@@ -15,85 +15,317 @@
     </div>
 
     <div class="player-stats-grid">
+        <!-- Hitting Stats - Only show if player has at bats -->
+        {% if player.stats.atBats %}
         <div class="stats-card">
-            <h3 class="card-title">📊 Season Statistics</h3>
+            <h3 class="card-title">📊 Primary Hitting Stats</h3>
             <table class="stats-table">
                 <tbody>
-                    <tr>
-                        <td>Batting Average</td>
-                        <td class="stat-value">{{ player.stats.avg or 'N/A' }}</td>
-                    </tr>
-                    <tr>
-                        <td>On Base %</td>
-                        <td class="stat-value">{{ player.stats.obp or 'N/A' }}</td>
-                    </tr>
-                    <tr>
-                        <td>Slugging %</td>
-                        <td class="stat-value">{{ player.stats.slg or 'N/A' }}</td>
-                    </tr>
-                    <tr>
-                        <td>OPS</td>
-                        <td class="stat-value highlight">{{ player.stats.ops or 'N/A' }}</td>
-                    </tr>
-                    <tr>
-                        <td>Home Runs</td>
-                        <td class="stat-value">{{ player.stats.homeRuns or '0' }}</td>
-                    </tr>
-                    <tr>
-                        <td>RBI</td>
-                        <td class="stat-value">{{ player.stats.rbi or '0' }}</td>
-                    </tr>
-                    <tr>
-                        <td>Runs</td>
-                        <td class="stat-value">{{ player.stats.runs or '0' }}</td>
-                    </tr>
-                    <tr>
-                        <td>Hits</td>
-                        <td class="stat-value">{{ player.stats.hits or '0' }}</td>
-                    </tr>
+                    {% if player.stats.gamesPlayed %}
+                    <tr><td>Games Played</td><td class="stat-value">{{ player.stats.gamesPlayed }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.atBats %}
+                    <tr><td>At Bats</td><td class="stat-value">{{ player.stats.atBats }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.plateAppearances %}
+                    <tr><td>Plate Appearances</td><td class="stat-value">{{ player.stats.plateAppearances }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.hits %}
+                    <tr><td>Hits</td><td class="stat-value">{{ player.stats.hits }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.avg %}
+                    <tr><td>Batting Average</td><td class="stat-value highlight">{{ player.stats.avg }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.obp %}
+                    <tr><td>On Base %</td><td class="stat-value">{{ player.stats.obp }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.slg %}
+                    <tr><td>Slugging %</td><td class="stat-value">{{ player.stats.slg }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.ops %}
+                    <tr><td>OPS</td><td class="stat-value highlight">{{ player.stats.ops }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.babip %}
+                    <tr><td>BABIP</td><td class="stat-value">{{ player.stats.babip }}</td></tr>
+                    {% endif %}
                 </tbody>
             </table>
         </div>
 
         <div class="stats-card">
-            <h3 class="card-title">🔥 Performance Metrics</h3>
+            <h3 class="card-title">🏃‍♂️ Counting Stats</h3>
             <table class="stats-table">
                 <tbody>
-                    <tr>
-                        <td>Games Played</td>
-                        <td class="stat-value">{{ player.stats.gamesPlayed or '0' }}</td>
-                    </tr>
-                    <tr>
-                        <td>At Bats</td>
-                        <td class="stat-value">{{ player.stats.atBats or '0' }}</td>
-                    </tr>
-                    <tr>
-                        <td>Plate Appearances</td>
-                        <td class="stat-value">{{ player.stats.plateAppearances or '0' }}</td>
-                    </tr>
-                    <tr>
-                        <td>Doubles</td>
-                        <td class="stat-value">{{ player.stats.doubles or '0' }}</td>
-                    </tr>
-                    <tr>
-                        <td>Triples</td>
-                        <td class="stat-value">{{ player.stats.triples or '0' }}</td>
-                    </tr>
-                    <tr>
-                        <td>Walks</td>
-                        <td class="stat-value">{{ player.stats.baseOnBalls or '0' }}</td>
-                    </tr>
-                    <tr>
-                        <td>Strikeouts</td>
-                        <td class="stat-value">{{ player.stats.strikeOuts or '0' }}</td>
-                    </tr>
-                    <tr>
-                        <td>Stolen Bases</td>
-                        <td class="stat-value">{{ player.stats.stolenBases or '0' }}</td>
-                    </tr>
+                    {% if player.stats.runs %}
+                    <tr><td>Runs</td><td class="stat-value">{{ player.stats.runs }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.doubles %}
+                    <tr><td>Doubles</td><td class="stat-value">{{ player.stats.doubles }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.triples %}
+                    <tr><td>Triples</td><td class="stat-value">{{ player.stats.triples }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.homeRuns %}
+                    <tr><td>Home Runs</td><td class="stat-value highlight">{{ player.stats.homeRuns }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.rbi %}
+                    <tr><td>RBI</td><td class="stat-value">{{ player.stats.rbi }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.totalBases %}
+                    <tr><td>Total Bases</td><td class="stat-value">{{ player.stats.totalBases }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.atBatsPerHomeRun %}
+                    <tr><td>AB per HR</td><td class="stat-value">{{ player.stats.atBatsPerHomeRun }}</td></tr>
+                    {% endif %}
                 </tbody>
             </table>
         </div>
+
+        <div class="stats-card">
+            <h3 class="card-title">👁️ Plate Discipline</h3>
+            <table class="stats-table">
+                <tbody>
+                    {% if player.stats.strikeOuts %}
+                    <tr><td>Strikeouts</td><td class="stat-value">{{ player.stats.strikeOuts }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.baseOnBalls %}
+                    <tr><td>Walks</td><td class="stat-value">{{ player.stats.baseOnBalls }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.intentionalWalks %}
+                    <tr><td>Intentional Walks</td><td class="stat-value">{{ player.stats.intentionalWalks }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.hitByPitch %}
+                    <tr><td>Hit By Pitch</td><td class="stat-value">{{ player.stats.hitByPitch }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.numberOfPitches %}
+                    <tr><td>Total Pitches</td><td class="stat-value">{{ player.stats.numberOfPitches }}</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="stats-card">
+            <h3 class="card-title">🏃‍♂️ Speed & Situational</h3>
+            <table class="stats-table">
+                <tbody>
+                    {% if player.stats.stolenBases %}
+                    <tr><td>Stolen Bases</td><td class="stat-value">{{ player.stats.stolenBases }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.caughtStealing %}
+                    <tr><td>Caught Stealing</td><td class="stat-value">{{ player.stats.caughtStealing }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.stolenBasePercentage %}
+                    <tr><td>SB Success %</td><td class="stat-value">{{ player.stats.stolenBasePercentage }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.leftOnBase %}
+                    <tr><td>Left on Base</td><td class="stat-value">{{ player.stats.leftOnBase }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.groundIntoDoublePlay %}
+                    <tr><td>Ground into DP</td><td class="stat-value">{{ player.stats.groundIntoDoublePlay }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.sacFlies %}
+                    <tr><td>Sacrifice Flies</td><td class="stat-value">{{ player.stats.sacFlies }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.sacBunts %}
+                    <tr><td>Sacrifice Bunts</td><td class="stat-value">{{ player.stats.sacBunts }}</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="stats-card">
+            <h3 class="card-title">⚾ Contact Profile</h3>
+            <table class="stats-table">
+                <tbody>
+                    {% if player.stats.groundOuts %}
+                    <tr><td>Ground Outs</td><td class="stat-value">{{ player.stats.groundOuts }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.airOuts %}
+                    <tr><td>Air Outs</td><td class="stat-value">{{ player.stats.airOuts }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.groundOutsToAirouts %}
+                    <tr><td>GO/AO Ratio</td><td class="stat-value">{{ player.stats.groundOutsToAirouts }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.catchersInterference %}
+                    <tr><td>Catcher's Interference</td><td class="stat-value">{{ player.stats.catchersInterference }}</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        <!-- Pitching Stats - Only show if player has games pitched -->
+        {% if player.stats.gamesPitched %}
+        <div class="stats-card">
+            <h3 class="card-title">🥎 Primary Pitching Stats</h3>
+            <table class="stats-table">
+                <tbody>
+                    {% if player.stats.gamesPitched %}
+                    <tr><td>Games Pitched</td><td class="stat-value">{{ player.stats.gamesPitched }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.gamesStarted %}
+                    <tr><td>Games Started</td><td class="stat-value">{{ player.stats.gamesStarted }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.gamesFinished %}
+                    <tr><td>Games Finished</td><td class="stat-value">{{ player.stats.gamesFinished }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.inningsPitched %}
+                    <tr><td>Innings Pitched</td><td class="stat-value">{{ player.stats.inningsPitched }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.era %}
+                    <tr><td>ERA</td><td class="stat-value highlight">{{ player.stats.era }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.whip %}
+                    <tr><td>WHIP</td><td class="stat-value highlight">{{ player.stats.whip }}</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="stats-card">
+            <h3 class="card-title">🏆 Wins & Decisions</h3>
+            <table class="stats-table">
+                <tbody>
+                    {% if player.stats.wins %}
+                    <tr><td>Wins</td><td class="stat-value highlight">{{ player.stats.wins }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.losses %}
+                    <tr><td>Losses</td><td class="stat-value">{{ player.stats.losses }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.winPercentage %}
+                    <tr><td>Win %</td><td class="stat-value">{{ player.stats.winPercentage }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.completeGames %}
+                    <tr><td>Complete Games</td><td class="stat-value">{{ player.stats.completeGames }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.shutouts %}
+                    <tr><td>Shutouts</td><td class="stat-value">{{ player.stats.shutouts }}</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="stats-card">
+            <h3 class="card-title">💾 Saves & Relief</h3>
+            <table class="stats-table">
+                <tbody>
+                    {% if player.stats.saves %}
+                    <tr><td>Saves</td><td class="stat-value highlight">{{ player.stats.saves }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.saveOpportunities %}
+                    <tr><td>Save Opportunities</td><td class="stat-value">{{ player.stats.saveOpportunities }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.blownSaves %}
+                    <tr><td>Blown Saves</td><td class="stat-value">{{ player.stats.blownSaves }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.holds %}
+                    <tr><td>Holds</td><td class="stat-value">{{ player.stats.holds }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.inheritedRunners %}
+                    <tr><td>Inherited Runners</td><td class="stat-value">{{ player.stats.inheritedRunners }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.inheritedRunnersScored %}
+                    <tr><td>Inherited Scored</td><td class="stat-value">{{ player.stats.inheritedRunnersScored }}</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="stats-card">
+            <h3 class="card-title">🎯 Strikeouts & Rate Stats</h3>
+            <table class="stats-table">
+                <tbody>
+                    {% if player.stats.strikeOuts %}
+                    <tr><td>Strikeouts</td><td class="stat-value">{{ player.stats.strikeOuts }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.strikeoutsPer9Inn %}
+                    <tr><td>K/9</td><td class="stat-value">{{ player.stats.strikeoutsPer9Inn }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.walksPer9Inn %}
+                    <tr><td>BB/9</td><td class="stat-value">{{ player.stats.walksPer9Inn }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.strikeoutWalkRatio %}
+                    <tr><td>K/BB Ratio</td><td class="stat-value">{{ player.stats.strikeoutWalkRatio }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.hitsPer9Inn %}
+                    <tr><td>Hits/9</td><td class="stat-value">{{ player.stats.hitsPer9Inn }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.runsScoredPer9 %}
+                    <tr><td>Runs/9</td><td class="stat-value">{{ player.stats.runsScoredPer9 }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.homeRunsPer9 %}
+                    <tr><td>HR/9</td><td class="stat-value">{{ player.stats.homeRunsPer9 }}</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="stats-card">
+            <h3 class="card-title">🎯 Control & Efficiency</h3>
+            <table class="stats-table">
+                <tbody>
+                    {% if player.stats.battersFaced %}
+                    <tr><td>Batters Faced</td><td class="stat-value">{{ player.stats.battersFaced }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.strikes %}
+                    <tr><td>Total Strikes</td><td class="stat-value">{{ player.stats.strikes }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.strikePercentage %}
+                    <tr><td>Strike %</td><td class="stat-value">{{ player.stats.strikePercentage }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.pitchesPerInning %}
+                    <tr><td>Pitches/Inning</td><td class="stat-value">{{ player.stats.pitchesPerInning }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.outs %}
+                    <tr><td>Total Outs</td><td class="stat-value">{{ player.stats.outs }}</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="stats-card">
+            <h3 class="card-title">🚫 Run Prevention</h3>
+            <table class="stats-table">
+                <tbody>
+                    {% if player.stats.earnedRuns %}
+                    <tr><td>Earned Runs</td><td class="stat-value">{{ player.stats.earnedRuns }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.baseOnBalls %}
+                    <tr><td>Walks</td><td class="stat-value">{{ player.stats.baseOnBalls }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.intentionalWalks %}
+                    <tr><td>Intentional Walks</td><td class="stat-value">{{ player.stats.intentionalWalks }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.hits %}
+                    <tr><td>Hits Allowed</td><td class="stat-value">{{ player.stats.hits }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.homeRuns %}
+                    <tr><td>HR Allowed</td><td class="stat-value">{{ player.stats.homeRuns }}</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="stats-card">
+            <h3 class="card-title">⚾ Advanced Pitching</h3>
+            <table class="stats-table">
+                <tbody>
+                    {% if player.stats.wildPitches %}
+                    <tr><td>Wild Pitches</td><td class="stat-value">{{ player.stats.wildPitches }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.hitBatsmen %}
+                    <tr><td>Hit Batsmen</td><td class="stat-value">{{ player.stats.hitBatsmen }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.balks %}
+                    <tr><td>Balks</td><td class="stat-value">{{ player.stats.balks }}</td></tr>
+                    {% endif %}
+                    {% if player.stats.pickoffs %}
+                    <tr><td>Pickoffs</td><td class="stat-value">{{ player.stats.pickoffs }}</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
     </div>
 
     {% if player.hit_streak and player.hit_streak > 0 %}
