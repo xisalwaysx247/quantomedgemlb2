@@ -5,3 +5,8 @@ python-dotenv
 mlbstatsapi
 nginx
 tabulate
+fastapi
+uvicorn
+jinja2
+rich
+python-multipart

@@ -1,0 +1,1515 @@
+:root {
+    --bg: #0B0F19;
+    --bg-card: #1A1D2B;
+    --bg-hover: #252A3D;
+    --accent: #00E3FF;
+    --accent-hover: #00B8CC;
+    --danger: #FF006E;
+    --success: #00FF87;
+    --warning: #FFE135;
+    --text: #E8EAF6;
+    --text-muted: #B3B9C4;
+    --text-dim: #8A91A3;
+    --border: #1E2230;
+    --strong: #00FF87;
+    --bubble: #FFE135;
+    --weak: #FF006E;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* Header & Navigation */
+header {
+    background: linear-gradient(135deg, var(--bg) 0%, var(--bg-card) 100%);
+    border-bottom: 2px solid var(--accent);
+    padding: 2rem 0;
+    text-align: center;
+}
+
+.logo-container {
+    margin-bottom: 2rem;
+}
+
+.ascii-logo {
+    color: var(--accent);
+    font-size: 0.6rem;
+    line-height: 1;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px var(--accent);
+    animation: pulse 3s ease-in-out infinite;
+}
+
+.site-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(45deg, var(--accent), var(--success));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+nav {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+nav a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+nav a:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+/* Main Content */
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    min-height: calc(100vh - 200px);
+}
+
+/* Hero Section */
+.hero-section {
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(45deg, var(--accent), var(--success), var(--warning));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 2rem;
+}
+
+.hero-description {
+    max-width: 800px;
+    margin: 0 auto 3rem;
+}
+
+.lead {
+    font-size: 1.3rem;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+}
+
+.highlight {
+    color: var(--warning);
+    font-weight: 700;
+}
+
+.accent {
+    color: var(--accent);
+    font-weight: 700;
+}
+
+/* Feature Grid */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.feature-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+    transform: translateY(-5px);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+    color: var(--accent);
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.feature-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-block;
+    margin-top: 1rem;
+    transition: color 0.3s ease;
+}
+
+.feature-link:hover {
+    color: var(--accent-hover);
+}
+
+/* CTA Section */
+.cta-section {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 3rem;
+    margin: 3rem 0;
+    border: 1px solid var(--accent);
+}
+
+.cta-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--accent);
+}
+
+.cta-description {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    color: var(--text-muted);
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 2px solid;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+.btn-secondary:hover {
+    background: var(--accent);
+    color: var(--bg);
+    transform: translateY(-2px);
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-card);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 1rem 0;
+}
+
+th, td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+th {
+    background: var(--bg-hover);
+    color: var(--accent);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+tr:hover {
+    background: var(--bg-hover);
+}
+
+.hitter-row, .player-row {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.hitter-row:hover, .player-row:hover {
+    background: var(--bg-hover);
+    transform: scale(1.01);
+}
+
+/* Tier styling */
+.tier-cell {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Player links */
+.player-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.player-link:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
+
+/* Game Cards */
+.game-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.game-header {
+    margin-bottom: 2rem;
+}
+
+.game-title {
+    color: var(--accent);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.pitcher-section {
+    margin-bottom: 3rem;
+}
+
+.pitcher-title {
+    color: var(--danger);
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+}
+
+/* Stats styling */
+.stat-value {
+    color: var(--warning);
+    font-weight: 600;
+}
+
+.mlb-avg {
+    color: var(--text-dim);
+    font-style: italic;
+}
+
+/* Summary Stats */
+.summary-stats {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+}
+
+.stat-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    flex: 1;
+    min-width: 150px;
+}
+
+.stat-box.strong {
+    border-color: var(--strong);
+    color: var(--strong);
+}
+
+.stat-box.bubble {
+    border-color: var(--bubble);
+    color: var(--bubble);
+}
+
+.stat-box.weak {
+    border-color: var(--weak);
+    color: var(--weak);
+}
+
+.stat-box.total {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-count {
+    display: block;
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.stat-pct {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Recommendations */
+.recommendation {
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    border-left: 4px solid;
+}
+
+.recommendation.excellent {
+    background: rgba(0, 255, 135, 0.1);
+    border-color: var(--strong);
+    color: var(--strong);
+}
+
+.recommendation.good {
+    background: rgba(255, 225, 53, 0.1);
+    border-color: var(--bubble);
+    color: var(--bubble);
+}
+
+.recommendation.moderate {
+    background: rgba(255, 225, 53, 0.1);
+    border-color: var(--warning);
+    color: var(--warning);
+}
+
+.recommendation.limited {
+    background: rgba(255, 0, 110, 0.1);
+    border-color: var(--weak);
+    color: var(--weak);
+}
+
+/* Status Note */
+.status-note {
+    margin-top: 4rem;
+    text-align: center;
+}
+
+.note {
+    background: var(--bg-card);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    color: var(--text-muted);
+}
+
+.pulse-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--success);
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Error messages */
+.error-message {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.error-message h1 {
+    color: var(--danger);
+    margin-bottom: 1rem;
+}
+
+.error-actions {
+    margin-top: 2rem;
+}
+
+/* Page Headers */
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    color: var(--accent);
+    margin-bottom: 1rem;
+}
+
+.page-description {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Footer */
+footer {
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Animations */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .lead {
+        font-size: 1.1rem;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    table {
+        font-size: 0.9rem;
+    }
+    
+    th, td {
+        padding: 0.5rem;
+    }
+    
+    .summary-stats {
+        flex-direction: column;
+    }
+    
+    .ascii-logo {
+        font-size: 0.4rem;
+    }
+    
+    nav {
+        gap: 1rem;
+    }
+    
+    nav a {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    main {
+        padding: 1rem 0.5rem;
+    }
+    
+    .hero-title {
+        font-size: 1.5rem;
+    }
+    
+    .site-title {
+        font-size: 1.8rem;
+    }
+    
+    .feature-card, .cta-section {
+        padding: 1.5rem;
+    }
+    
+    table {
+        font-size: 0.8rem;
+    }
+    
+    .ascii-logo {
+        display: none;
+    }
+}
+
+/* Games Grid Layout */
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.game-card.clickable {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.game-card.clickable:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    box-shadow: 0 10px 30px rgba(0, 227, 255, 0.2);
+}
+
+.game-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.weak-pitcher-count {
+    background: var(--danger);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.weak-pitchers-preview {
+    margin: 1.5rem 0;
+}
+
+.pitcher-preview {
+    padding: 1rem;
+    background: var(--bg-hover);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.pitcher-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.pitcher-name {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+/* Clickable Player Styles */
+.clickable-player {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+    padding: 2px 4px;
+    display: inline-block;
+}
+
+.clickable-player:hover {
+    background: rgba(0, 227, 255, 0.1);
+    color: var(--accent);
+    text-shadow: 0 0 8px var(--accent);
+    transform: scale(1.05);
+}
+
+.clickable-player:active {
+    transform: scale(0.98);
+}
+
+.pitcher-team {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.opponent-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.vs-label {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+}
+
+.opponent-team {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.opportunity-level {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.opportunity-level.excellent {
+    background: rgba(0, 255, 135, 0.1);
+    border: 1px solid var(--success);
+}
+
+.opportunity-level.good {
+    background: rgba(255, 225, 53, 0.1);
+    border: 1px solid var(--warning);
+}
+
+.opportunity-level.limited {
+    background: rgba(255, 0, 110, 0.1);
+    border: 1px solid var(--danger);
+}
+
+.opportunity-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.quick-stats {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.stat-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+}
+
+.stat-preview.strong {
+    background: rgba(0, 255, 135, 0.1);
+}
+
+.stat-preview.bubble {
+    background: rgba(255, 225, 53, 0.1);
+}
+
+.stat-preview.weak {
+    background: rgba(255, 0, 110, 0.1);
+}
+
+.stat-value {
+    font-weight: 600;
+}
+
+.stat-label {
+    color: var(--text-muted);
+}
+
+.pitcher-divider {
+    border: none;
+    height: 1px;
+    background: var(--border);
+    margin: 1rem 0;
+}
+
+.game-footer {
+    text-align: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.click-hint {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+.no-games-message {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-muted);
+}
+
+.no-games-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+/* Game Detail Page */
+.game-detail-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.breadcrumb {
+    margin-bottom: 1rem;
+}
+
+.breadcrumb-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.breadcrumb-link:hover {
+    text-decoration: underline;
+}
+
+.lineup-analysis {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: var(--bg-hover);
+    border-radius: 8px;
+    border-left: 4px solid var(--accent);
+}
+
+.analysis-title {
+    color: var(--accent);
+    margin-bottom: 1rem;
+}
+
+.lineup-stats {
+    display: grid;
+    gap: 1rem;
+}
+
+.lineup-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lineup-label {
+    color: var(--text-muted);
+}
+
+.lineup-value {
+    font-weight: 600;
+}
+
+.lineup-value.excellent {
+    color: var(--success);
+}
+
+.lineup-value.good {
+    color: var(--warning);
+}
+
+.lineup-value.average {
+    color: var(--accent);
+}
+
+.lineup-value.weak {
+    color: var(--danger);
+}
+
+.hitter-row.lineup-spot {
+    background: rgba(0, 227, 255, 0.05);
+}
+
+.hitter-row.bench-spot {
+    background: rgba(139, 145, 163, 0.05);
+}
+
+.lineup-indicator {
+    background: var(--accent);
+    color: var(--bg);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+}
+
+.bench-indicator {
+    background: var(--text-dim);
+    color: white;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+}
+
+.impact-high {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.impact-medium {
+    color: var(--warning);
+    font-weight: 600;
+}
+
+.impact-low {
+    color: var(--text-muted);
+}
+
+.status.weak {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.navigation-footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+    .games-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .game-detail-container {
+        padding: 1rem;
+    }
+    
+    .quick-stats {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .lineup-stats {
+        gap: 0.5rem;
+    }
+    
+    .lineup-stat {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.2rem;
+    }
+}
+
+/* Pick Tank Styles */
+.pick-tank-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.games-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.game-section {
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.game-info h2 {
+    margin: 0;
+    color: var(--accent);
+}
+
+.game-meta {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.game-time {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.game-status {
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.game-status.scheduled {
+    background: rgba(0, 227, 255, 0.1);
+    color: var(--accent);
+}
+
+.game-status.live {
+    background: rgba(0, 255, 135, 0.1);
+    color: var(--success);
+}
+
+.picks-section {
+    margin-top: 1.5rem;
+}
+
+.picks-title {
+    color: var(--text);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.picks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.pick {
+    background: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.2s ease;
+}
+
+.pick:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 12px rgba(0, 227, 255, 0.1);
+}
+
+.pick-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.pick-stars {
+    display: flex;
+    gap: 0.1rem;
+}
+
+.star {
+    color: var(--accent);
+    text-shadow: 0 0 5px var(--accent);
+}
+
+.type-badge {
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.type-badge.team {
+    background: rgba(0, 255, 135, 0.2);
+    color: var(--success);
+}
+
+.type-badge.player {
+    background: rgba(255, 225, 53, 0.2);
+    color: var(--warning);
+}
+
+.pick-time {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+}
+
+.pick-content {
+    margin-top: 0.5rem;
+}
+
+.pick-main {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.pick-market {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.pick-separator {
+    color: var(--accent);
+    font-weight: bold;
+}
+
+.pick-selection {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.pick-odds {
+    color: var(--success);
+    font-weight: 600;
+    background: rgba(0, 255, 135, 0.1);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+}
+
+.pick-comment {
+    margin-top: 0.5rem;
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 0.9rem;
+    border-left: 3px solid var(--border);
+    padding-left: 0.8rem;
+}
+
+.no-picks {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+}
+
+.no-picks-text {
+    margin: 0;
+}
+
+.inline-link {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.inline-link:hover {
+    text-decoration: underline;
+}
+
+/* Pick Form Styles */
+.pick-form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.form-container {
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+.pick-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label {
+    color: var(--text);
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.label-help {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 0.8rem;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    background: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.75rem;
+    color: var(--text);
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(0, 227, 255, 0.2);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.star-rating {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.star-slider {
+    width: 100%;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.star-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 227, 255, 0.5);
+}
+
+.star-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 10px rgba(0, 227, 255, 0.5);
+}
+
+.star-display {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.star-value {
+    color: var(--accent);
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.star-text {
+    color: var(--text-muted);
+}
+
+.star-visual {
+    display: flex;
+    gap: 0.1rem;
+}
+
+.star-visual .star {
+    font-size: 1.2rem;
+    opacity: 0.3;
+    transition: opacity 0.2s ease;
+}
+
+.star-visual .star.active {
+    opacity: 1;
+    text-shadow: 0 0 5px var(--accent);
+}
+
+.char-count {
+    align-self: flex-end;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.form-actions .btn {
+    flex: 1;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .pick-tank-container,
+    .pick-form-container {
+        padding: 1rem;
+    }
+    
+    .game-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .game-actions {
+        width: 100%;
+    }
+    
+    .game-actions .btn {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .pick-main {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .star-display {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
+
+/* All Games Styles */
+.all-games-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.pitchers-preview {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: var(--bg-hover);
+    border-radius: 6px;
+}
+
+.pitcher-matchup {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.away-pitcher,
+.home-pitcher {
+    flex: 1;
+    text-align: center;
+}
+
+.pitcher-label {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
+}
+
+.pitcher-name {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.vs-divider {
+    color: var(--accent);
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.date-navigation {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+}
+
+.nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.current-date {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.quick-nav {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* Single Game Detail Styles */
+.single-game-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.game-overview {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.pitcher-matchup-full {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 2rem;
+    align-items: center;
+}
+
+.pitcher-card {
+    padding: 1.5rem;
+    background: var(--bg-hover);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.pitcher-card.away {
+    border-left: 4px solid var(--warning);
+}
+
+.pitcher-card.home {
+    border-left: 4px solid var(--success);
+}
+
+.pitcher-title {
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.pitcher-name {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.pitcher-stats-quick {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.pitcher-stats-quick .stat {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.vs-large {
+    color: var(--accent);
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 0 0 10px var(--accent);
+}
+
+.teams-analysis {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.team-section {
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+}
+
+.team-title {
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+@media (max-width: 1200px) {
+    .teams-analysis {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .pitcher-matchup-full {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .vs-large {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .all-games-container,
+    .single-game-container {
+        padding: 1rem;
+    }
+    
+    .pitcher-matchup {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .nav-buttons {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .quick-nav {
+        flex-direction: column;
+    }
+    
+    .pitcher-stats-quick {
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+}

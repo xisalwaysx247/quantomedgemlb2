@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}➕ Add Pick - {{ game.matchup }}{% endblock %}
+
+{% block content %}
+<div class="pick-form-container">
+    <div class="page-header">
+        <div class="breadcrumb">
+            <a href="/pick-tank" class="breadcrumb-link">← Back to Pick Tank</a>
+        </div>
+        <h1 class="page-title">➕ Add Pick</h1>
+        <p class="page-description">
+            <strong>{{ game.matchup }}</strong> - Add your betting analysis and prediction
+        </p>
+    </div>
+
+    <div class="form-container">
+        <form method="post" action="/pick-tank/new" class="pick-form">
+            <input type="hidden" name="game_pk" value="{{ game.game_pk }}">
+            
+            <div class="form-group">
+                <label for="stars" class="form-label">
+                    ⭐ Confidence Rating
+                    <span class="label-help">How confident are you in this pick?</span>
+                </label>
+                <div class="star-rating">
+                    <input type="range" id="stars" name="stars" min="1" max="5" value="3" class="star-slider">
+                    <div class="star-display">
+                        <span class="star-value">3</span>
+                        <span class="star-text">Stars</span>
+                        <div class="star-visual">
+                            <span class="star active">⭐</span>
+                            <span class="star active">⭐</span>
+                            <span class="star active">⭐</span>
+                            <span class="star">⭐</span>
+                            <span class="star">⭐</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="pick_type" class="form-label">
+                    🎯 Pick Type
+                    <span class="label-help">What kind of bet is this?</span>
+                </label>
+                <select id="pick_type" name="pick_type" class="form-select" required>
+                    <option value="">Choose type...</option>
+                    <option value="TEAM">Team Bet (ML, Spread, Totals)</option>
+                    <option value="PLAYER">Player Prop (HR, Hits, K's)</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="player-dropdown-group" style="display: none;">
+                <label for="player_select" class="form-label">
+                    👤 Player
+                    <span class="label-help">Select a player from this game</span>
+                </label>
+                <select id="player_select" name="player_select" class="form-select">
+                    <option value="">Select a player...</option>
+                    <optgroup label="{{ game.away_team }}">
+                        {% for player in game.away_roster %}
+                        <option value="{{ player.name }}" data-player-id="{{ player.id }}">
+                            {{ player.name }} ({{ player.position }})
+                        </option>
+                        {% endfor %}
+                    </optgroup>
+                    <optgroup label="{{ game.home_team }}">
+                        {% for player in game.home_roster %}
+                        <option value="{{ player.name }}" data-player-id="{{ player.id }}">
+                            {{ player.name }} ({{ player.position }})
+                        </option>
+                        {% endfor %}
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="market" class="form-label">
+                    📊 Market
+                    <span class="label-help">What market are you betting? (e.g., "Moneyline", "Over 8.5", "Soto HR")</span>
+                </label>
+                <input type="text" id="market" name="market" class="form-input" 
+                       placeholder="e.g., Moneyline, Over 8.5, Player HR" 
+                       maxlength="120" required>
+                <div class="char-count">
+                    <span id="market-count">0</span>/120
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="selection" class="form-label">
+                    ✅ Selection
+                    <span class="label-help">Your specific pick (e.g., "Yankees", "Juan Soto HR")</span>
+                </label>
+                <input type="text" id="selection" name="selection" class="form-input" 
+                       placeholder="e.g., Yankees, Juan Soto HR, Under 8.5" 
+                       maxlength="120" required>
+                <div class="char-count">
+                    <span id="selection-count">0</span>/120
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="odds" class="form-label">
+                    💰 Odds (Optional)
+                    <span class="label-help">The odds you got (e.g., "+150", "-110")</span>
+                </label>
+                <input type="text" id="odds" name="odds" class="form-input" 
+                       placeholder="e.g., +150, -110, +600" 
+                       maxlength="20">
+            </div>
+
+            <div class="form-group">
+                <label for="comment" class="form-label">
+                    💭 Analysis (Optional)
+                    <span class="label-help">Your reasoning, notes, or analysis</span>
+                </label>
+                <textarea id="comment" name="comment" class="form-textarea" 
+                          placeholder="Share your analysis, reasoning, or any notes about this pick..." 
+                          maxlength="500" rows="4"></textarea>
+                <div class="char-count">
+                    <span id="comment-count">0</span>/500
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    🎯 Add Pick
+                </button>
+                <a href="/pick-tank" class="btn btn-secondary">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Star rating slider
+    const starSlider = document.getElementById('stars');
+    const starValue = document.querySelector('.star-value');
+    const starVisuals = document.querySelectorAll('.star-visual .star');
+    
+    function updateStars(value) {
+        starValue.textContent = value;
+        starVisuals.forEach((star, index) => {
+            if (index < value) {
+                star.classList.add('active');
+            } else {
+                star.classList.remove('active');
+            }
+        });
+    }
+    
+    starSlider.addEventListener('input', function() {
+        updateStars(this.value);
+    });
+    
+    // Pick type dropdown handling
+    const pickTypeSelect = document.getElementById('pick_type');
+    const playerDropdownGroup = document.getElementById('player-dropdown-group');
+    const playerSelect = document.getElementById('player_select');
+    const selectionInput = document.getElementById('selection');
+    const marketInput = document.getElementById('market');
+    
+    pickTypeSelect.addEventListener('change', function() {
+        if (this.value === 'PLAYER') {
+            playerDropdownGroup.style.display = 'block';
+        } else {
+            playerDropdownGroup.style.display = 'none';
+            playerSelect.value = '';
+        }
+    });
+    
+    // Player selection handling
+    playerSelect.addEventListener('change', function() {
+        const selectedPlayer = this.value;
+        if (selectedPlayer) {
+            // Auto-populate selection field with player name
+            selectionInput.value = selectedPlayer;
+            
+            // Update market placeholder for player props
+            marketInput.placeholder = 'e.g., Home Run, Hit, Strikeout, Total Bases Over 1.5';
+        }
+    });
+    
+    // Character counters
+    function setupCharCounter(inputId, counterId, maxLength) {
+        const input = document.getElementById(inputId);
+        const counter = document.getElementById(counterId);
+        
+        if (input && counter) {
+            input.addEventListener('input', function() {
+                const count = this.value.length;
+                counter.textContent = count;
+                
+                if (count > maxLength * 0.9) {
+                    counter.style.color = 'var(--danger)';
+                } else if (count > maxLength * 0.8) {
+                    counter.style.color = 'var(--warning)';
+                } else {
+                    counter.style.color = 'var(--text-muted)';
+                }
+            });
+        }
+    }
+    
+    setupCharCounter('market', 'market-count', 120);
+    setupCharCounter('selection', 'selection-count', 120);
+    setupCharCounter('comment', 'comment-count', 500);
+});
+</script>
+{% endblock %}

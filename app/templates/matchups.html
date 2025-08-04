@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}⚠️ Weak Pitcher Matchups - Quantum Edge Analytics{% endblock %}
+
+{% block content %}
+<div class="matchups-container">
+    <div class="page-header">
+        <h1 class="page-title">⚠️ Weak Pitcher Alert - {{ date }}</h1>
+        <p class="page-description">
+            {% if games %}
+                Found {{ games|length }} game(s) with weak pitcher matchups! 
+                Click any game below to view detailed analysis.
+            {% else %}
+                🎯 No weak pitchers identified for {{ date }}. All pitchers meet strength criteria.
+            {% endif %}
+        </p>
+    </div>
+
+    {% if games %}
+        <div class="games-grid">
+            {% for game in games %}
+            <div class="game-card clickable" onclick="window.location.href='/game/{{ game.game.gamePk }}?date={{ date }}'">
+                <div class="game-header">
+                    <h2 class="game-title">🔷 {{ game.away_team }} @ {{ game.home_team }}</h2>
+                    <div class="game-meta">
+                        <span class="weak-pitcher-count">{{ game.weak_pitchers|length }} weak pitcher(s)</span>
+                    </div>
+                </div>
+
+                <div class="weak-pitchers-preview">
+                    {% for weak_pitcher in game.weak_pitchers %}
+                    <div class="pitcher-preview">
+                        <div class="pitcher-info">
+                            <span class="pitcher-name clickable-player" data-player-id="{{ weak_pitcher.pitcher.id if weak_pitcher.pitcher.id else '' }}" data-player-name="{{ weak_pitcher.pitcher.fullName }}">⚠️ {{ weak_pitcher.pitcher.fullName }}</span>
+                            <span class="pitcher-team">({{ weak_pitcher.pitcher_team }})</span>
+                        </div>
+                        
+                        <div class="opponent-preview">
+                            <span class="vs-label">vs</span>
+                            <span class="opponent-team">{{ weak_pitcher.opponent_team }}</span>
+                        </div>
+
+                        {% if weak_pitcher.recommendation %}
+                        <div class="opportunity-level {{ weak_pitcher.recommendation.type }}">
+                            <span class="opportunity-icon">{{ weak_pitcher.recommendation.icon }}</span>
+                            <span class="opportunity-text">
+                                {% if weak_pitcher.recommendation.type == "excellent" %}
+                                    Excellent Opportunity
+                                {% elif weak_pitcher.recommendation.type == "good" %}
+                                    Good Opportunity
+                                {% else %}
+                                    Limited Opportunity
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+
+                        <div class="quick-stats">
+                            <div class="stat-preview strong">
+                                <span class="stat-icon">🟢</span>
+                                <span class="stat-value">{{ weak_pitcher.strong_count }}</span>
+                                <span class="stat-label">({{ weak_pitcher.strong_pct }}%)</span>
+                            </div>
+                            <div class="stat-preview bubble">
+                                <span class="stat-icon">🟡</span>
+                                <span class="stat-value">{{ weak_pitcher.bubble_count }}</span>
+                                <span class="stat-label">({{ weak_pitcher.bubble_pct }}%)</span>
+                            </div>
+                            <div class="stat-preview weak">
+                                <span class="stat-icon">🔴</span>
+                                <span class="stat-value">{{ weak_pitcher.weak_count }}</span>
+                                <span class="stat-label">({{ weak_pitcher.weak_pct }}%)</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% if not loop.last and game.weak_pitchers|length > 1 %}
+                    <hr class="pitcher-divider">
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="game-footer">
+                    <span class="click-hint">Click to view detailed analysis →</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-games-message">
+            <div class="no-games-icon">🎯</div>
+            <h3>No Weak Pitcher Opportunities Today</h3>
+            <p>All starting pitchers for {{ date }} meet our strength criteria. Check back tomorrow for new opportunities!</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

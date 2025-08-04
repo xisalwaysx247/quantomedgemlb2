@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}👥 {{ team.name if team else 'Team' }} - Quantum Edge Analytics{% endblock %}
+
+{% block content %}
+<div class="team-container">
+    {% if team %}
+    <div class="page-header">
+        <h1 class="page-title">👥 {{ team.name }}</h1>
+        <div class="team-meta">
+            <span class="division-badge">{{ team.division or 'N/A' }}</span>
+            <span class="league-badge">{{ team.league or 'N/A' }}</span>
+        </div>
+    </div>
+
+    {% if roster %}
+    <div class="roster-summary">
+        <h3 class="section-title">📊 Roster Composition</h3>
+        <div class="summary-stats">
+            <div class="stat-box strong">
+                <span class="stat-label">🟢 Strong Hitters</span>
+                <span class="stat-count">{{ roster_stats.strong_count }}</span>
+                <span class="stat-pct">{{ roster_stats.strong_pct }}%</span>
+            </div>
+            <div class="stat-box bubble">
+                <span class="stat-label">🟡 Bubble Hitters</span>
+                <span class="stat-count">{{ roster_stats.bubble_count }}</span>
+                <span class="stat-pct">{{ roster_stats.bubble_pct }}%</span>
+            </div>
+            <div class="stat-box weak">
+                <span class="stat-label">🔴 Weak Hitters</span>
+                <span class="stat-count">{{ roster_stats.weak_count }}</span>
+                <span class="stat-pct">{{ roster_stats.weak_pct }}%</span>
+            </div>
+            <div class="stat-box total">
+                <span class="stat-label">⚾ Total Hitters</span>
+                <span class="stat-count">{{ roster_stats.total_hitters }}</span>
+                <span class="stat-pct">100%</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="roster-sections">
+        <div class="hitters-section">
+            <h3 class="section-title">🎯 Position Players</h3>
+            <table class="roster-table">
+                <thead>
+                    <tr>
+                        <th>Tier</th>
+                        <th>Player</th>
+                        <th>Position</th>
+                        <th>AVG</th>
+                        <th>HR</th>
+                        <th>RBI</th>
+                        <th>OPS</th>
+                        <th>Streak</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in roster.hitters %}
+                    <tr class="player-row" data-player-id="{{ player.player_id }}">
+                        <td class="tier-cell">{{ player.tier }}</td>
+                        <td class="player-name">
+                            <a href="/player/{{ player.player_id }}" class="player-link">{{ player.name }}</a>
+                        </td>
+                        <td class="position">{{ player.position }}</td>
+                        <td class="avg">{{ player.avg }}</td>
+                        <td class="hr">{{ player.hr }}</td>
+                        <td class="rbi">{{ player.rbi }}</td>
+                        <td class="ops">{{ player.ops }}</td>
+                        <td class="streak">{{ player.streak if player.streak != '0' else '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if roster.pitchers %}
+        <div class="pitchers-section">
+            <h3 class="section-title">⚾ Pitchers</h3>
+            <table class="roster-table">
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Role</th>
+                        <th>ERA</th>
+                        <th>WHIP</th>
+                        <th>W-L</th>
+                        <th>K/9</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pitcher in roster.pitchers %}
+                    <tr class="player-row">
+                        <td class="player-name">
+                            <a href="/player/{{ pitcher.player_id }}" class="player-link">{{ pitcher.name }}</a>
+                        </td>
+                        <td class="role">{{ pitcher.role or 'P' }}</td>
+                        <td class="era">{{ pitcher.era }}</td>
+                        <td class="whip">{{ pitcher.whip }}</td>
+                        <td class="record">{{ pitcher.wins }}-{{ pitcher.losses }}</td>
+                        <td class="k9">{{ pitcher.strikeouts_per_nine }}</td>
+                        <td class="status {{ pitcher.status_class }}">{{ pitcher.status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if roster_stats.lineup_analysis %}
+    <div class="lineup-analysis">
+        <h3 class="section-title">🏟️ Probable Lineup Analysis</h3>
+        <div class="lineup-stats">
+            <div class="lineup-breakdown">
+                <h4>Top 9 Hitters (Likely Starters)</h4>
+                <div class="lineup-composition">
+                    <span class="lineup-stat strong">🟢 {{ roster_stats.lineup_analysis.strong_in_lineup }} Strong ({{ roster_stats.lineup_analysis.strong_pct }}%)</span>
+                    <span class="lineup-stat bubble">🟡 {{ roster_stats.lineup_analysis.bubble_in_lineup }} Bubble ({{ roster_stats.lineup_analysis.bubble_pct }}%)</span>
+                    <span class="lineup-stat weak">🔴 {{ roster_stats.lineup_analysis.weak_in_lineup }} Weak ({{ roster_stats.lineup_analysis.weak_pct }}%)</span>
+                </div>
+            </div>
+
+            {% if roster_stats.bench_analysis %}
+            <div class="bench-breakdown">
+                <h4>🛏️ Bench Depth ({{ roster_stats.bench_analysis.bench_count }} players)</h4>
+                <div class="bench-composition">
+                    <span class="bench-stat strong">🟢 {{ roster_stats.bench_analysis.bench_strong }} Strong</span>
+                    <span class="bench-stat bubble">🟡 {{ roster_stats.bench_analysis.bench_bubble }} Bubble</span>
+                    <span class="bench-stat weak">🔴 {{ roster_stats.bench_analysis.bench_weak }} Weak</span>
+                </div>
+                <p class="depth-assessment {{ roster_stats.bench_analysis.depth_class }}">
+                    {{ roster_stats.bench_analysis.depth_message }}
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="team-actions">
+        <a href="/matchups" class="btn btn-primary">⚠️ Check Weak Pitchers</a>
+        <a href="/" class="btn btn-secondary">🏠 Return Home</a>
+    </div>
+
+    {% else %}
+    <p class="no-data">No roster data available for this team.</p>
+    {% endif %}
+
+    {% else %}
+    <div class="error-message">
+        <h1>👥 Team Not Found</h1>
+        <p>The requested team could not be found or has no available data.</p>
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">🏠 Return Home</a>
+            <a href="/matchups" class="btn btn-secondary">⚠️ View Matchups</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}🧠 Quantum Edge Analytics{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <pre class="ascii-logo">
+ ██████╗ ██╗   ██╗ █████╗ ███╗   ██╗████████╗██╗   ██╗███╗   ███╗
+██╔═══██╗██║   ██║██╔══██╗████╗  ██║╚══██╔══╝██║   ██║████╗ ████║
+██║   ██║██║   ██║███████║██╔██╗ ██║   ██║   ██║   ██║██╔████╔██║
+██║▄▄ ██║██║   ██║██╔══██║██║╚██╗██║   ██║   ██║   ██║██║╚██╔╝██║
+╚██████╔╝╚██████╔╝██║  ██║██║ ╚████║   ██║   ╚██████╔╝██║ ╚═╝ ██║
+ ╚══▀▀═╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝    ╚═════╝ ╚═╝     ╚═╝
+            
+███████╗██████╗  ██████╗ ███████╗    🧠✨🔮
+██╔════╝██╔══██╗██╔════╝ ██╔════╝
+█████╗  ██║  ██║██║  ███╗█████╗  
+██╔══╝  ██║  ██║██║   ██║██╔══╝  
+███████╗██████╔╝╚██████╔╝███████╗
+╚══════╝╚═════╝  ╚═════╝ ╚══════╝
+            </pre>
+            <h1 class="site-title">🧠✨ Quantum Edge Analytics</h1>
+            <p class="subtitle">Futuristic MLB Analytics & Market Intelligence</p>
+        </div>
+        
+        <nav>
+            <a href="/">🏠 Home</a>
+            <a href="/games">🏟️ All Games</a>
+            <a href="/matchups">⚠️ Weak Pitchers</a>
+            <a href="/pick-tank">🎯 Pick Tank</a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>🧠 Quantum Edge Analytics • Advanced MLB Intelligence • <span class="pulse">⚡ Real-Time Insights</span></p>
+    </footer>
+
+    {% include "player_modal.html" %}
+
+    <script src="/static/edge.js"></script>
+</body>
+</html>

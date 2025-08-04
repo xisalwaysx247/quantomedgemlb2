@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}🏟️ All Games - {{ date }} - Quantum Edge Analytics{% endblock %}
+
+{% block content %}
+<div class="all-games-container">
+    <div class="page-header">
+        <h1 class="page-title">🏟️ All MLB Games</h1>
+        <div class="current-date">{{ date }}</div>
+        <p class="page-description">
+            {% if games %}
+                {{ total_games }} game(s) scheduled
+            {% else %}
+                No games scheduled
+            {% endif %}
+        </p>
+    </div>
+
+    {% if games %}
+        <div class="games-grid">
+            {% for game in games %}
+            <div class="game-card clickable" onclick="window.location.href='/games/{{ game.game_pk }}?date={{ date }}'">
+                <div class="game-header">
+                    <h2 class="game-title">🔷 {{ game.away_team }} @ {{ game.home_team }}</h2>
+                    <div class="game-meta">
+                        <span class="game-status {{ 'live' if game.is_live else 'final' if game.is_final else 'scheduled' }}">
+                            {{ game.status }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="pitchers-preview">
+                    <div class="pitcher-matchup">
+                        <div class="away-pitcher">
+                            <span class="pitcher-label">Away:</span>
+                            <span class="pitcher-name">{{ game.away_pitcher }}</span>
+                        </div>
+                        <div class="vs-divider">vs</div>
+                        <div class="home-pitcher">
+                            <span class="pitcher-label">Home:</span>
+                            <span class="pitcher-name">{{ game.home_pitcher }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-footer">
+                    <span class="click-hint">Click for full team analysis →</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="date-navigation">
+            <div class="nav-buttons">
+                <a href="/games?date={{ prev_date }}" class="btn btn-secondary">
+                    ← Previous Day
+                </a>
+                <span class="current-date">{{ date }}</span>
+                <a href="/games?date={{ next_date }}" class="btn btn-secondary">
+                    Next Day →
+                </a>
+            </div>
+            
+            <div class="quick-nav">
+                <a href="/games?date={{ today }}" class="btn btn-primary">Today</a>
+            </div>
+        </div>
+    {% else %}
+        <div class="no-games-message">
+            <div class="no-games-icon">📅</div>
+            <h3>No Games Scheduled</h3>
+            <p>No MLB games found for {{ date }}. Try a different date or check back during the season!</p>
+            
+            <div class="quick-nav">
+                <a href="/games" class="btn btn-primary">Today's Games</a>
+                <a href="/matchups" class="btn btn-secondary">Check Weak Pitchers</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects for game cards
+    const gameCards = document.querySelectorAll('.game-card.clickable');
+    gameCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

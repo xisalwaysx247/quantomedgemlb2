@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}⚾ {{ player.fullName if player else 'Player' }} - Quantum Edge Analytics{% endblock %}
+
+{% block content %}
+<div class="player-container">
+    {% if player %}
+    <div class="page-header">
+        <h1 class="page-title">⚾ {{ player.fullName }}</h1>
+        <div class="player-meta">
+            <span class="team-badge">{{ player.team or 'Free Agent' }}</span>
+            <span class="position-badge">{{ player.position or 'N/A' }}</span>
+            <span class="tier-badge {{ player.tier_class }}">{{ player.tier }} {{ player.tier_label }}</span>
+        </div>
+    </div>
+
+    <div class="player-stats-grid">
+        <div class="stats-card">
+            <h3 class="card-title">📊 Season Statistics</h3>
+            <table class="stats-table">
+                <tbody>
+                    <tr>
+                        <td>Batting Average</td>
+                        <td class="stat-value">{{ player.stats.avg or 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td>On Base %</td>
+                        <td class="stat-value">{{ player.stats.obp or 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Slugging %</td>
+                        <td class="stat-value">{{ player.stats.slg or 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td>OPS</td>
+                        <td class="stat-value highlight">{{ player.stats.ops or 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Home Runs</td>
+                        <td class="stat-value">{{ player.stats.homeRuns or '0' }}</td>
+                    </tr>
+                    <tr>
+                        <td>RBI</td>
+                        <td class="stat-value">{{ player.stats.rbi or '0' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Runs</td>
+                        <td class="stat-value">{{ player.stats.runs or '0' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Hits</td>
+                        <td class="stat-value">{{ player.stats.hits or '0' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="stats-card">
+            <h3 class="card-title">🔥 Performance Metrics</h3>
+            <table class="stats-table">
+                <tbody>
+                    <tr>
+                        <td>Games Played</td>
+                        <td class="stat-value">{{ player.stats.gamesPlayed or '0' }}</td>
+                    </tr>
+                    <tr>
+                        <td>At Bats</td>
+                        <td class="stat-value">{{ player.stats.atBats or '0' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Plate Appearances</td>
+                        <td class="stat-value">{{ player.stats.plateAppearances or '0' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Doubles</td>
+                        <td class="stat-value">{{ player.stats.doubles or '0' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Triples</td>
+                        <td class="stat-value">{{ player.stats.triples or '0' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Walks</td>
+                        <td class="stat-value">{{ player.stats.baseOnBalls or '0' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Strikeouts</td>
+                        <td class="stat-value">{{ player.stats.strikeOuts or '0' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Stolen Bases</td>
+                        <td class="stat-value">{{ player.stats.stolenBases or '0' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if player.hit_streak and player.hit_streak > 0 %}
+    <div class="streak-alert">
+        <div class="streak-icon">🔥</div>
+        <div class="streak-content">
+            <h3>Active Hit Streak!</h3>
+            <p>{{ player.fullName }} is currently on a <strong>{{ player.hit_streak }}-game hit streak</strong></p>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if player.last_5_games %}
+    <div class="recent-games">
+        <h3 class="section-title">📈 Last 5 Games</h3>
+        <table class="games-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Opponent</th>
+                    <th>Result</th>
+                    <th>AB</th>
+                    <th>H</th>
+                    <th>R</th>
+                    <th>RBI</th>
+                    <th>AVG</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for game in player.last_5_games %}
+                <tr>
+                    <td>{{ game.date }}</td>
+                    <td>{{ game.opponent }}</td>
+                    <td class="result {{ game.result_class }}">{{ game.result }}</td>
+                    <td>{{ game.ab }}</td>
+                    <td>{{ game.hits }}</td>
+                    <td>{{ game.runs }}</td>
+                    <td>{{ game.rbi }}</td>
+                    <td>{{ game.avg }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <div class="player-actions">
+        <a href="/team/{{ player.team_id }}" class="btn btn-secondary">👥 View Team Roster</a>
+        <a href="/matchups" class="btn btn-primary">⚠️ Check Weak Pitchers</a>
+    </div>
+
+    {% else %}
+    <div class="error-message">
+        <h1>⚾ Player Not Found</h1>
+        <p>The requested player could not be found or has no available data.</p>
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">🏠 Return Home</a>
+            <a href="/matchups" class="btn btn-secondary">⚠️ View Matchups</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

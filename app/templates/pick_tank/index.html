@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}🎯 Pick Tank - Quantum Edge Analytics{% endblock %}
+
+{% block content %}
+<div class="pick-tank-container">
+    <div class="page-header">
+        <h1 class="page-title">🎯 Pick Tank - {{ date }}</h1>
+        <p class="page-description">
+            Your personal betting bulletin board. Attach picks to any game and track your analysis.
+        </p>
+    </div>
+
+    {% if games %}
+        <div class="games-list">
+            {% for game in games %}
+            <div class="game-section" id="game-{{ game.game_pk }}">
+                <div class="game-header">
+                    <div class="game-info">
+                        <h2 class="game-title">🔷 {{ game.away_team }} @ {{ game.home_team }}</h2>
+                        <div class="game-meta">
+                            <span class="game-status {{ 'live' if 'Progress' in game.status else 'scheduled' }}">
+                                {{ game.status }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="game-actions">
+                        <a href="/pick-tank/new?game_pk={{ game.game_pk }}" class="btn btn-primary">
+                            ➕ Add Pick
+                        </a>
+                    </div>
+                </div>
+
+                {% if game.picks %}
+                <div class="picks-section">
+                    <h3 class="picks-title">Your Picks ({{ game.picks|length }})</h3>
+                    <div class="picks-list">
+                        {% for pick in game.picks %}
+                        <div class="pick">
+                            <div class="pick-header">
+                                <div class="pick-stars">
+                                    {% for i in range(pick.stars) %}
+                                        <span class="star">⭐</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="pick-type">
+                                    <span class="type-badge {{ 'team' if pick.pick_type == 'TEAM' else 'player' }}">
+                                        {{ pick.pick_type }}
+                                    </span>
+                                </div>
+                                <div class="pick-time">
+                                    {{ pick.created_at.strftime('%H:%M') if pick.created_at else '' }}
+                                </div>
+                            </div>
+                            
+                            <div class="pick-content">
+                                <div class="pick-main">
+                                    <span class="pick-market">{{ pick.market }}</span>
+                                    <span class="pick-separator">→</span>
+                                    <span class="pick-selection">{{ pick.selection }}</span>
+                                    {% if pick.odds %}
+                                        <span class="pick-odds">({{ pick.odds }})</span>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if pick.comment %}
+                                <div class="pick-comment">
+                                    "{{ pick.comment }}"
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="no-picks">
+                    <p class="no-picks-text">No picks yet for this game. <a href="/pick-tank/new?game_pk={{ game.game_pk }}" class="inline-link">Add your first pick!</a></p>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-games-message">
+            <div class="no-games-icon">📅</div>
+            <h3>No Games Found</h3>
+            <p>No MLB games scheduled for {{ date }}. Check back during the season!</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+// Simple character count for any future forms
+document.addEventListener('DOMContentLoaded', function() {
+    // Scroll to game if hash is present
+    if (window.location.hash) {
+        const target = document.querySelector(window.location.hash);
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+            target.style.border = '2px solid var(--accent)';
+            setTimeout(() => {
+                target.style.border = '';
+            }, 3000);
+        }
+    }
+});
+</script>
+{% endblock %}

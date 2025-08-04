@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}🔷 {{ game.away_team }} @ {{ game.home_team }} - Complete Analysis{% endblock %}
+
+{% block content %}
+<div class="single-game-container">
+    <div class="page-header">
+        <div class="breadcrumb">
+            <a href="/games?date={{ date }}" class="breadcrumb-link">← Back to All Games</a>
+        </div>
+        <h1 class="page-title">🔷 {{ game.away_team }} @ {{ game.home_team }}</h1>
+        <p class="page-description">
+            Complete team analysis for {{ date }} - {{ game.status }}
+        </p>
+    </div>
+
+    <div class="game-overview">
+        <div class="pitcher-matchup-full">
+            <div class="pitcher-card away">
+                <h3 class="pitcher-title">{{ game.away_team }} Pitcher</h3>
+                <div class="pitcher-info">
+                    <span class="pitcher-name clickable-player" data-player-id="{{ game.away_pitcher.id if game.away_pitcher.id else '' }}" data-player-name="{{ game.away_pitcher.fullName or 'TBD' }}">{{ game.away_pitcher.fullName or 'TBD' }}</span>
+                    {% if game.away_pitcher.stats %}
+                    <div class="pitcher-stats-quick">
+                        <span class="stat">ERA: {{ game.away_pitcher.stats.era if game.away_pitcher.stats.era else 'N/A' }}</span>
+                        <span class="stat">WHIP: {{ game.away_pitcher.stats.whip if game.away_pitcher.stats.whip else 'N/A' }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="vs-section">
+                <span class="vs-large">VS</span>
+            </div>
+            
+            <div class="pitcher-card home">
+                <h3 class="pitcher-title">{{ game.home_team }} Pitcher</h3>
+                <div class="pitcher-info">
+                    <span class="pitcher-name clickable-player" data-player-id="{{ game.home_pitcher.id if game.home_pitcher.id else '' }}" data-player-name="{{ game.home_pitcher.fullName or 'TBD' }}">{{ game.home_pitcher.fullName or 'TBD' }}</span>
+                    {% if game.home_pitcher.stats %}
+                    <div class="pitcher-stats-quick">
+                        <span class="stat">ERA: {{ game.home_pitcher.stats.era if game.home_pitcher.stats.era else 'N/A' }}</span>
+                        <span class="stat">WHIP: {{ game.home_pitcher.stats.whip if game.home_pitcher.stats.whip else 'N/A' }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="teams-analysis">
+        <!-- Away Team Section -->
+        <div class="team-section">
+            <h2 class="team-title">🚌 {{ game.away_team }} Lineup</h2>
+            
+            {% if game.away_roster %}
+            <div class="roster-summary">
+                {% set away_strong = game.away_roster|selectattr("tier", "equalto", "🟢")|list|length %}
+                {% set away_bubble = game.away_roster|selectattr("tier", "equalto", "🟡")|list|length %}
+                {% set away_weak = game.away_roster|selectattr("tier", "equalto", "🔴")|list|length %}
+                {% set away_total = game.away_roster|length %}
+                
+                            <div class="team-summary">
+                <h3>{{ game.away_team }} Team Summary</h3>
+                
+                <div class="summary-stats">
+                    <div class="stat-box strong">
+                        <span class="stat-label">🟢 Strong</span>
+                        <span class="stat-count">{{ game.away_stats.strong_count }}</span>
+                        <span class="stat-pct">{{ game.away_stats.strong_pct }}%</span>
+                    </div>
+                    <div class="stat-box bubble">
+                        <span class="stat-label">🟡 Bubble</span>
+                        <span class="stat-count">{{ game.away_stats.bubble_count }}</span>
+                        <span class="stat-pct">{{ game.away_stats.bubble_pct }}%</span>
+                    </div>
+                    <div class="stat-box weak">
+                        <span class="stat-label">🔴 Weak</span>
+                        <span class="stat-count">{{ game.away_stats.weak_count }}</span>
+                        <span class="stat-pct">{{ game.away_stats.weak_pct }}%</span>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <table class="hitters-table">
+                <thead>
+                    <tr>
+                        <th>Tier</th>
+                        <th>Player</th>
+                        <th>Pos</th>
+                        <th>AVG</th>
+                        <th>HR</th>
+                        <th>RBI</th>
+                        <th>OPS</th>
+                        <th>Streak</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hitter in game.away_roster %}
+                    <tr class="hitter-row {{ 'lineup-spot' if loop.index <= 9 else 'bench-spot' }}">
+                        <td class="tier-cell">{{ hitter.tier }}</td>
+                        <td class="player-name">
+                            <span class="clickable-player" data-player-id="{{ hitter.player_id }}" data-player-name="{{ hitter.name }}">{{ hitter.name }}</span>
+                            {% if loop.index <= 9 %}
+                                <span class="lineup-indicator">#{{ loop.index }}</span>
+                            {% else %}
+                                <span class="bench-indicator">Bench</span>
+                            {% endif %}
+                        </td>
+                        <td class="position">{{ hitter.position }}</td>
+                        <td class="avg">{{ hitter.avg }}</td>
+                        <td class="hr">{{ hitter.hr }}</td>
+                        <td class="rbi">{{ hitter.rbi }}</td>
+                        <td class="ops">{{ hitter.ops }}</td>
+                        <td class="streak">{{ hitter.streak if hitter.streak != '0' else '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="no-data">No roster data available for {{ game.away_team }}.</p>
+            {% endif %}
+        </div>
+
+        <!-- Home Team Section -->
+        <div class="team-section">
+            <h2 class="team-title">🏠 {{ game.home_team }} Lineup</h2>
+            
+            {% if game.home_roster %}
+            <div class="roster-summary">
+                <div class="summary-stats">
+                    <div class="stat-box strong">
+                        <span class="stat-label">🟢 Strong</span>
+                        <span class="stat-count">{{ game.home_stats.strong_count }}</span>
+                        <span class="stat-pct">{{ game.home_stats.strong_pct }}%</span>
+                    </div>
+                    <div class="stat-box bubble">
+                        <span class="stat-label">🟡 Bubble</span>
+                        <span class="stat-count">{{ game.home_stats.bubble_count }}</span>
+                        <span class="stat-pct">{{ game.home_stats.bubble_pct }}%</span>
+                    </div>
+                    <div class="stat-box weak">
+                        <span class="stat-label">🔴 Weak</span>
+                        <span class="stat-count">{{ game.home_stats.weak_count }}</span>
+                        <span class="stat-pct">{{ game.home_stats.weak_pct }}%</span>
+                    </div>
+                </div>
+            </div>
+
+            <table class="hitters-table">
+                <thead>
+                    <tr>
+                        <th>Tier</th>
+                        <th>Player</th>
+                        <th>Pos</th>
+                        <th>AVG</th>
+                        <th>HR</th>
+                        <th>RBI</th>
+                        <th>OPS</th>
+                        <th>Streak</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hitter in game.home_roster %}
+                    <tr class="hitter-row {{ 'lineup-spot' if loop.index <= 9 else 'bench-spot' }}">
+                        <td class="tier-cell">{{ hitter.tier }}</td>
+                        <td class="player-name">
+                            <span class="clickable-player" data-player-id="{{ hitter.player_id }}" data-player-name="{{ hitter.name }}">{{ hitter.name }}</span>
+                            {% if loop.index <= 9 %}
+                                <span class="lineup-indicator">#{{ loop.index }}</span>
+                            {% else %}
+                                <span class="bench-indicator">Bench</span>
+                            {% endif %}
+                        </td>
+                        <td class="position">{{ hitter.position }}</td>
+                        <td class="avg">{{ hitter.avg }}</td>
+                        <td class="hr">{{ hitter.hr }}</td>
+                        <td class="rbi">{{ hitter.rbi }}</td>
+                        <td class="ops">{{ hitter.ops }}</td>
+                        <td class="streak">{{ hitter.streak if hitter.streak != '0' else '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="no-data">No roster data available for {{ game.home_team }}.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="navigation-footer">
+        <a href="/games?date={{ date }}" class="btn btn-secondary">← Back to All Games</a>
+        <a href="/pick-tank/new?game_pk={{ game.game_pk }}" class="btn btn-primary">🎯 Add Pick for This Game</a>
+    </div>
+</div>
+{% endblock %}

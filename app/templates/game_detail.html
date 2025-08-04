@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}🔷 {{ game.away_team }} @ {{ game.home_team }} - Game Analysis{% endblock %}
+
+{% block content %}
+<div class="game-detail-container">
+    <div class="page-header">
+        <div class="breadcrumb">
+            <a href="/matchups?date={{ date }}" class="breadcrumb-link">← Back to Matchups</a>
+        </div>
+        <h1 class="page-title">🔷 {{ game.away_team }} @ {{ game.home_team }}</h1>
+        <p class="page-description">
+            Complete analysis for {{ date }} - {{ game.weak_pitchers|length }} weak pitcher(s) identified
+        </p>
+    </div>
+
+    {% for weak_pitcher in game.weak_pitchers %}
+    <div class="pitcher-section">
+        <div class="pitcher-header">
+            <h2 class="pitcher-title">⚠️ WEAK PITCHER: 
+                {% if weak_pitcher.pitcher.id and weak_pitcher.pitcher.id != 'None' and weak_pitcher.pitcher.id != '' %}
+                    <span class="clickable-player" data-player-id="{{ weak_pitcher.pitcher.id }}" data-player-name="{{ weak_pitcher.pitcher.fullName }}">{{ weak_pitcher.pitcher.fullName }}</span>
+                {% else %}
+                    {{ weak_pitcher.pitcher.fullName }}
+                {% endif %}
+                ({{ weak_pitcher.pitcher_team }})
+            </h2>
+        </div>
+
+        <div class="pitcher-stats">
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>Stat</th>
+                        <th>Value</th>
+                        <th>MLB Avg</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ERA</td>
+                        <td class="stat-value">{{ weak_pitcher.pitcher.stats.era or 'N/A' }}</td>
+                        <td class="mlb-avg">~4.20</td>
+                        <td class="status weak">{{ "High" if (weak_pitcher.pitcher.stats.era and (weak_pitcher.pitcher.stats.era|float > 4.20)) else "OK" }}</td>
+                    </tr>
+                    <tr>
+                        <td>WHIP</td>
+                        <td class="stat-value">{{ weak_pitcher.pitcher.stats.whip or 'N/A' }}</td>
+                        <td class="mlb-avg">~1.30</td>
+                        <td class="status weak">{{ "High" if (weak_pitcher.pitcher.stats.whip and (weak_pitcher.pitcher.stats.whip|float > 1.30)) else "OK" }}</td>
+                    </tr>
+                    <tr>
+                        <td>BAA</td>
+                        <td class="stat-value">{{ weak_pitcher.pitcher.stats.avg or 'N/A' }}</td>
+                        <td class="mlb-avg">~.240</td>
+                        <td class="status weak">{{ "High" if (weak_pitcher.pitcher.stats.avg and (weak_pitcher.pitcher.stats.avg|float > 0.240)) else "OK" }}</td>
+                    </tr>
+                    <tr>
+                        <td>H/9</td>
+                        <td class="stat-value">{{ weak_pitcher.pitcher.stats.hitsPer9Inn or 'N/A' }}</td>
+                        <td class="mlb-avg">~8.50</td>
+                        <td class="status weak">{{ "High" if (weak_pitcher.pitcher.stats.hitsPer9Inn and (weak_pitcher.pitcher.stats.hitsPer9Inn|float > 8.50)) else "OK" }}</td>
+                    </tr>
+                    <tr>
+                        <td>K/9</td>
+                        <td class="stat-value">{{ weak_pitcher.pitcher.stats.strikeoutsPer9Inn or 'N/A' }}</td>
+                        <td class="mlb-avg">~8.50</td>
+                        <td class="status weak">{{ "Low" if (weak_pitcher.pitcher.stats.strikeoutsPer9Inn and (weak_pitcher.pitcher.stats.strikeoutsPer9Inn|float < 8.50)) else "OK" }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="opponent-section">
+            <h3 class="opponent-title">🎯 {{ weak_pitcher.opponent_team }} Hitters vs Weak Pitcher</h3>
+            
+            {% if weak_pitcher.roster %}
+            <div class="roster-summary">
+                <div class="summary-stats">
+                    <div class="stat-box strong">
+                        <span class="stat-label">🟢 Strong</span>
+                        <span class="stat-count">{{ weak_pitcher.strong_count }}</span>
+                        <span class="stat-pct">{{ weak_pitcher.strong_pct }}%</span>
+                    </div>
+                    <div class="stat-box bubble">
+                        <span class="stat-label">🟡 Bubble</span>
+                        <span class="stat-count">{{ weak_pitcher.bubble_count }}</span>
+                        <span class="stat-pct">{{ weak_pitcher.bubble_pct }}%</span>
+                    </div>
+                    <div class="stat-box weak">
+                        <span class="stat-label">🔴 Weak</span>
+                        <span class="stat-count">{{ weak_pitcher.weak_count }}</span>
+                        <span class="stat-pct">{{ weak_pitcher.weak_pct }}%</span>
+                    </div>
+                </div>
+
+                {% if weak_pitcher.recommendation %}
+                <div class="recommendation {{ weak_pitcher.recommendation.type }}">
+                    <span class="rec-icon">{{ weak_pitcher.recommendation.icon }}</span>
+                    <span class="rec-text">{{ weak_pitcher.recommendation.text }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="lineup-analysis">
+                <h4 class="analysis-title">💡 Lineup Analysis</h4>
+                <div class="analysis-content">
+                    {% set top_9 = weak_pitcher.roster[:9] %}
+                    {% set strong_in_lineup = top_9|selectattr("tier", "equalto", "🟢")|list|length %}
+                    {% set bubble_in_lineup = top_9|selectattr("tier", "equalto", "🟡")|list|length %}
+                    {% set weak_in_lineup = 9 - strong_in_lineup - bubble_in_lineup %}
+                    
+                    <div class="lineup-stats">
+                        <div class="lineup-stat">
+                            <span class="lineup-label">Top 9 Strong Hitters:</span>
+                            <span class="lineup-value strong">{{ strong_in_lineup }}/9 ({{ "%.1f"|format((strong_in_lineup/9*100)) }}%)</span>
+                        </div>
+                        <div class="lineup-stat">
+                            <span class="lineup-label">Expected Lineup Quality:</span>
+                            <span class="lineup-value {{ 'excellent' if strong_in_lineup >= 3 else 'good' if strong_in_lineup >= 2 else 'average' if strong_in_lineup >= 1 else 'weak' }}">
+                                {{ "Excellent" if strong_in_lineup >= 3 else "Good" if strong_in_lineup >= 2 else "Average" if strong_in_lineup >= 1 else "Below Average" }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <table class="hitters-table">
+                <thead>
+                    <tr>
+                        <th>Tier</th>
+                        <th>Player</th>
+                        <th>Pos</th>
+                        <th>AVG</th>
+                        <th>HR</th>
+                        <th>RBI</th>
+                        <th>OPS</th>
+                        <th>Streak</th>
+                        <th>Impact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hitter in weak_pitcher.roster %}
+                    <tr class="hitter-row {{ 'lineup-spot' if loop.index <= 9 else 'bench-spot' }}" data-player-id="{{ hitter.player_id }}">
+                        <td class="tier-cell">{{ hitter.tier }}</td>
+                        <td class="player-name">
+                            {% if hitter.player_id and hitter.player_id != 'None' and hitter.player_id != '' %}
+                                <span class="clickable-player" data-player-id="{{ hitter.player_id }}" data-player-name="{{ hitter.name }}">{{ hitter.name }}</span>
+                            {% else %}
+                                {{ hitter.name }}
+                            {% endif %}
+                            {% if loop.index <= 9 %}
+                                <span class="lineup-indicator">#{{ loop.index }}</span>
+                            {% else %}
+                                <span class="bench-indicator">Bench</span>
+                            {% endif %}
+                        </td>
+                        <td class="position">{{ hitter.position }}</td>
+                        <td class="avg">{{ hitter.avg }}</td>
+                        <td class="hr">{{ hitter.hr }}</td>
+                        <td class="rbi">{{ hitter.rbi }}</td>
+                        <td class="ops">{{ hitter.ops }}</td>
+                        <td class="streak">{{ hitter.streak if hitter.streak != '0' else '-' }}</td>
+                        <td class="impact">
+                            {% if hitter.tier == "🟢" and loop.index <= 9 %}
+                                <span class="impact-high">High</span>
+                            {% elif hitter.tier == "🟢" %}
+                                <span class="impact-medium">Medium</span>
+                            {% elif hitter.tier == "🟡" and loop.index <= 9 %}
+                                <span class="impact-medium">Medium</span>
+                            {% else %}
+                                <span class="impact-low">Low</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="no-data">No roster data available for {{ weak_pitcher.opponent_team }}.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="navigation-footer">
+        <a href="/matchups?date={{ date }}" class="btn btn-secondary">← Back to All Matchups</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section">
+    <h1 class="hero-title">🧠✨ Welcome to Quantum Edge Analytics</h1>
+    
+    <div class="hero-description">
+        <p class="lead">
+            In the high-stakes world of professional sports and financial markets, 
+            <strong class="highlight">information asymmetry</strong> creates opportunity. 
+            Our advanced analytics platform gives you the <span class="accent">quantum edge</span> 
+            you need to identify market inefficiencies before they become obvious.
+        </p>
+        
+        <p>
+            By analyzing pitcher weaknesses, lineup depth, and roster composition through 
+            our proprietary tier-based classification system, we reveal hidden patterns 
+            that separate winners from everyone else.
+        </p>
+    </div>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">⚠️</div>
+            <h3>Weak Pitcher Detection</h3>
+            <p>Advanced algorithms identify vulnerable pitchers using ERA, WHIP, BAA, and other key metrics.</p>
+            <a href="/matchups" class="feature-link">Analyze Matchups →</a>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🏟️</div>
+            <h3>Complete Game Schedule</h3>
+            <p>View all MLB games for any date with full team breakdowns and roster analysis.</p>
+            <a href="/games" class="feature-link">View All Games →</a>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>Pick Tank</h3>
+            <p>Track your betting picks with confidence ratings, odds tracking, and performance analysis.</p>
+            <a href="/pick-tank" class="feature-link">Make Picks →</a>
+        </div>
+    </div>
+
+    <div class="cta-section">
+        <h2 class="cta-title">Ready to gain your edge?</h2>
+        <p class="cta-description">
+            Start with today's weak pitcher matchups or track your picks in the Pick Tank.
+        </p>
+        <div class="cta-buttons">
+            <a href="/matchups" class="btn btn-primary">🔍 Find Weak Pitchers</a>
+            <a href="/pick-tank" class="btn btn-secondary">🎯 Pick Tank</a>
+        </div>
+    </div>
+
+    <div class="status-note">
+        <p class="note">
+            <span class="pulse-dot"></span>
+            <strong>This is just the beginning</strong> — more analytical modules and market intelligence features coming soon.
+        </p>
+    </div>
+</div>
+{% endblock %}

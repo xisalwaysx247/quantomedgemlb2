@@ -1,0 +1,370 @@
+<!-- Player Detail Modal -->
+<div id="playerModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" onclick="closePlayerModal()">&times;</span>
+            <h2 id="playerModalTitle">Player Details</h2>
+        </div>
+        <div class="modal-body">
+            <div id="playerModalLoading" style="text-align: center; padding: 20px;">
+                <p>Loading player data...</p>
+            </div>
+            <div id="playerModalContent" style="display: none;">
+                <div class="player-stats-container">
+                    <div class="stats-section">
+                        <h3>Batting Statistics</h3>
+                        <div class="stats-grid" id="battingStats">
+                            <!-- Batting stats will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="stats-section">
+                        <h3>Pitching Statistics</h3>
+                        <div class="stats-grid" id="pitchingStats">
+                            <!-- Pitching stats will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="stats-section">
+                        <h3>Fielding Statistics</h3>
+                        <div class="stats-grid" id="fieldingStats">
+                            <!-- Fielding stats will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="playerModalError" style="display: none; color: red; text-align: center; padding: 20px;">
+                <p>Error loading player data. Please try again.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Modal Styles */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background-color: #1a1a1a;
+    margin: 5% auto;
+    padding: 0;
+    border: 2px solid #00ff88;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 1000px;
+    max-height: 80vh;
+    overflow-y: auto;
+    color: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3);
+}
+
+.modal-header {
+    padding: 20px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    border-bottom: 2px solid #00ff88;
+    border-radius: 10px 10px 0 0;
+    position: relative;
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: #00ff88;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close:hover,
+.close:focus {
+    color: #ff4444;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.player-stats-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.stats-section {
+    background: rgba(42, 42, 42, 0.5);
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.stats-section h3 {
+    color: #00ff88;
+    margin: 0 0 15px 0;
+    font-size: 1.2em;
+    border-bottom: 1px solid #333;
+    padding-bottom: 8px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    border-left: 3px solid #00ff88;
+}
+
+.stat-label {
+    color: #cccccc;
+    font-weight: 500;
+}
+
+.stat-value {
+    color: #ffffff;
+    font-weight: bold;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+        max-height: 70vh;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-header h2 {
+        font-size: 1.2em;
+    }
+}
+</style>
+
+<script>
+function openPlayerModal(playerId, playerName) {
+    const modal = document.getElementById('playerModal');
+    const title = document.getElementById('playerModalTitle');
+    const loading = document.getElementById('playerModalLoading');
+    const content = document.getElementById('playerModalContent');
+    const error = document.getElementById('playerModalError');
+    
+    console.log('Opening modal for player:', { playerId, playerName }); // Debug log
+    
+    // Show modal and loading state
+    modal.style.display = 'block';
+    title.textContent = playerName || 'Player Details';
+    loading.style.display = 'block';
+    content.style.display = 'none';
+    error.style.display = 'none';
+    
+    // Fetch player data
+    fetch(`/api/player/${playerId}`)
+        .then(response => {
+            console.log('API response status:', response.status); // Debug log
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Player data received:', data); // Debug log
+            loading.style.display = 'none';
+            populatePlayerStats(data);
+            content.style.display = 'block';
+        })
+        .catch(err => {
+            console.error('Error fetching player data:', err);
+            loading.style.display = 'none';
+            error.style.display = 'block';
+            
+            // Show more specific error message
+            const errorElement = document.querySelector('#playerModalError p');
+            if (err.message.includes('404')) {
+                errorElement.textContent = `Player data not found for ${playerName}. Player stats may not be available yet.`;
+            } else {
+                errorElement.textContent = `Error loading player data: ${err.message}`;
+            }
+        });
+}
+
+function closePlayerModal() {
+    document.getElementById('playerModal').style.display = 'none';
+}
+
+function populatePlayerStats(playerData) {
+    const battingStats = document.getElementById('battingStats');
+    const pitchingStats = document.getElementById('pitchingStats');
+    const fieldingStats = document.getElementById('fieldingStats');
+    
+    // Clear existing content
+    battingStats.innerHTML = '';
+    pitchingStats.innerHTML = '';
+    fieldingStats.innerHTML = '';
+    
+    const stats = playerData.stats;
+    
+    // Batting statistics
+    const battingFields = [
+        { key: 'gamesPlayed', label: 'Games Played' },
+        { key: 'atBats', label: 'At Bats' },
+        { key: 'hits', label: 'Hits' },
+        { key: 'avg', label: 'Batting Average' },
+        { key: 'runs', label: 'Runs' },
+        { key: 'doubles', label: 'Doubles' },
+        { key: 'triples', label: 'Triples' },
+        { key: 'homeRuns', label: 'Home Runs' },
+        { key: 'rbi', label: 'RBI' },
+        { key: 'obp', label: 'On Base %' },
+        { key: 'slg', label: 'Slugging %' },
+        { key: 'ops', label: 'OPS' },
+        { key: 'strikeOuts', label: 'Strikeouts' },
+        { key: 'baseOnBalls', label: 'Walks' },
+        { key: 'stolenBases', label: 'Stolen Bases' },
+        { key: 'caughtStealing', label: 'Caught Stealing' }
+    ];
+    
+    battingFields.forEach(field => {
+        if (stats.hasOwnProperty(field.key) && stats[field.key] !== undefined) {
+            const statItem = createStatItem(field.label, stats[field.key]);
+            battingStats.appendChild(statItem);
+        }
+    });
+    
+    // Pitching statistics
+    const pitchingFields = [
+        { key: 'gamesPitched', label: 'Games Pitched' },
+        { key: 'gamesStarted', label: 'Games Started' },
+        { key: 'inningsPitched', label: 'Innings Pitched' },
+        { key: 'wins', label: 'Wins' },
+        { key: 'losses', label: 'Losses' },
+        { key: 'era', label: 'ERA' },
+        { key: 'whip', label: 'WHIP' },
+        { key: 'saves', label: 'Saves' },
+        { key: 'holds', label: 'Holds' },
+        { key: 'earnedRuns', label: 'Earned Runs' },
+        { key: 'battersFaced', label: 'Batters Faced' },
+        { key: 'strikePercentage', label: 'Strike %' },
+        { key: 'pitchesPerInning', label: 'Pitches/Inning' }
+    ];
+    
+    pitchingFields.forEach(field => {
+        if (stats.hasOwnProperty(field.key) && stats[field.key] !== undefined) {
+            const statItem = createStatItem(field.label, stats[field.key]);
+            pitchingStats.appendChild(statItem);
+        }
+    });
+    
+    // Fielding statistics
+    const fieldingFields = [
+        { key: 'groundOuts', label: 'Ground Outs' },
+        { key: 'airOuts', label: 'Air Outs' },
+        { key: 'groundOutsToAirouts', label: 'GO/AO Ratio' },
+        { key: 'totalBases', label: 'Total Bases' },
+        { key: 'hitByPitch', label: 'Hit By Pitch' },
+        { key: 'intentionalWalks', label: 'Intentional Walks' },
+        { key: 'groundIntoDoublePlay', label: 'Double Plays' }
+    ];
+    
+    fieldingFields.forEach(field => {
+        if (stats.hasOwnProperty(field.key) && stats[field.key] !== undefined) {
+            const statItem = createStatItem(field.label, stats[field.key]);
+            fieldingStats.appendChild(statItem);
+        }
+    });
+}
+
+function createStatItem(label, value) {
+    const div = document.createElement('div');
+    div.className = 'stat-item';
+    
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'stat-label';
+    labelSpan.textContent = label;
+    
+    const valueSpan = document.createElement('span');
+    valueSpan.className = 'stat-value';
+    valueSpan.textContent = value;
+    
+    div.appendChild(labelSpan);
+    div.appendChild(valueSpan);
+    
+    return div;
+}
+
+// Close modal when clicking outside of it
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('playerModal');
+    if (event.target === modal) {
+        closePlayerModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closePlayerModal();
+    }
+});
+
+// Add click event listeners to all clickable players
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners to existing clickable players
+    addPlayerClickListeners();
+});
+
+// Function to add click listeners to clickable players
+function addPlayerClickListeners() {
+    const clickablePlayers = document.querySelectorAll('.clickable-player');
+    clickablePlayers.forEach(player => {
+        if (!player.hasClickListener) {
+            player.addEventListener('click', function() {
+                const playerId = this.getAttribute('data-player-id');
+                const playerName = this.getAttribute('data-player-name');
+                
+                console.log('Player clicked:', { playerId, playerName }); // Debug log
+                
+                if (playerId && playerId !== '' && playerId !== 'None' && playerName && playerName !== 'TBD') {
+                    openPlayerModal(playerId, playerName);
+                } else {
+                    console.warn('Player click ignored - missing data:', { playerId, playerName });
+                }
+            });
+            player.hasClickListener = true;
+        }
+    });
+}
+
+// Call this function whenever new content is loaded
+window.addPlayerClickListeners = addPlayerClickListeners;
+</script>

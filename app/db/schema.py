@@ -1,6 +1,8 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, Table
+from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, Table, Text, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql import func
+from datetime import datetime
 
 Base = declarative_base()
 
@@ -93,3 +95,16 @@ class PitcherStats(Base):
     strikeout_walk_ratio = Column(Float, nullable=True)
 
     player = relationship('Player', back_populates='pitcher_stats')
+
+class Pick(Base):
+    __tablename__ = 'picks'
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    game_pk = Column(Integer, nullable=False)  # MLB gamePk
+    pick_type = Column(String(20), nullable=False)  # 'TEAM' | 'PLAYER'
+    market = Column(String(120), nullable=False)  # e.g. 'ML', 'Over 8.5', 'HR prop'
+    selection = Column(String(120), nullable=False)  # e.g. 'Yankees', 'Juan Soto HR'
+    odds = Column(String(20), nullable=True)  # optional +110 / -105 etc.
+    stars = Column(Integer, nullable=False)  # 1-5 rating
+    comment = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)

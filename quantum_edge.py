@@ -37,6 +37,7 @@ def list_commands():
     table.add_column("Command", style="bright_blue")
     table.add_column("Description", style="green")
 
+    table.add_row("serve", "🌐 Launch Quantum Edge web server.")
     table.add_row("pull-teams", "Pull all teams and save them to /data/teams.json.")
     table.add_row("pull-rosters", "Pull full rosters for all teams and save them.")
     table.add_row("pull-player-stats", "Pull advanced stats for all players.")
@@ -51,6 +52,221 @@ def list_commands():
     table.add_row("refresh_report", "Generate matchup report with fresh data (bypass cache).")
 
     console.print(table)
+
+@app.command()
+def backup_picks():
+    """
+    💾 Create a backup of the Pick Tank database
+    
+    Creates a timestamped backup of the entire database to ensure
+    your picks are never lost.
+    """
+    console.print("\n💾 [bold cyan]Creating Pick Tank Backup[/bold cyan]\n")
+    
+    try:
+        from app.db.session import backup_database, DATABASE_FILE
+        import os
+        
+        if not os.path.exists(DATABASE_FILE):
+            console.print("[red]❌ Database file not found![/red]")
+            return
+        
+        backup_file = backup_database()
+        if backup_file:
+            file_size = os.path.getsize(backup_file)
+            console.print(f"[green]✅ Backup created successfully![/green]")
+            console.print(f"[dim]📁 File: {backup_file}[/dim]")
+            console.print(f"[dim]📊 Size: {file_size:,} bytes[/dim]")
+            
+            # Show some stats
+            from app.db.schema import Pick
+            from app.db.session import SessionLocal
+            
+            db = SessionLocal()
+            try:
+                total_picks = db.query(Pick).count()
+                console.print(f"[dim]🎯 Total picks backed up: {total_picks}[/dim]")
+            except Exception as e:
+                console.print(f"[yellow]⚠️ Could not count picks: {e}[/yellow]")
+            finally:
+                db.close()
+        else:
+            console.print("[red]❌ Backup failed![/red]")
+            
+    except Exception as e:
+        console.print(f"[red]❌ Error creating backup: {e}[/red]")
+
+@app.command()
+def verify_picks():
+    """
+    🔍 Verify Pick Tank data integrity
+    
+    Checks that the picks database is working correctly and
+    shows statistics about stored picks.
+    """
+    console.print("\n🔍 [bold cyan]Pick Tank Data Verification[/bold cyan]\n")
+    
+    try:
+        from app.db.schema import Pick
+        from app.db.session import SessionLocal, verify_picks_table
+        from sqlalchemy import func
+        
+        # Verify table exists
+        if not verify_picks_table():
+            console.print("[red]❌ Pick Tank table verification failed![/red]")
+            return
+        
+        db = SessionLocal()
+        try:
+            # Test database connection
+            from sqlalchemy import text
+            db.execute(text("SELECT 1"))
+            console.print("[green]✅ Database connection successful[/green]")
+            
+            # Count total picks
+            total_picks = db.query(Pick).count()
+            console.print(f"[cyan]📊 Total picks in database: {total_picks}[/cyan]")
+            
+            if total_picks > 0:
+                # Get pick statistics
+                pick_types = db.query(Pick.pick_type, func.count(Pick.id)).group_by(Pick.pick_type).all()
+                star_dist = db.query(Pick.stars, func.count(Pick.id)).group_by(Pick.stars).order_by(Pick.stars).all()
+                
+                console.print("\n[bold]📈 Pick Type Distribution:[/bold]")
+                for pick_type, count in pick_types:
+                    console.print(f"  {pick_type}: {count}")
+                
+                console.print("\n[bold]⭐ Star Rating Distribution:[/bold]")
+                for stars, count in star_dist:
+                    star_display = "⭐" * stars
+                    console.print(f"  {star_display} ({stars}): {count}")
+                
+                # Show recent picks
+                recent_picks = db.query(Pick).order_by(Pick.created_at.desc()).limit(5).all()
+                if recent_picks:
+                    console.print("\n[bold]🕒 Recent Picks:[/bold]")
+                    for pick in recent_picks:
+                        created = pick.created_at.strftime("%Y-%m-%d %H:%M") if pick.created_at else "Unknown"
+                        stars = "⭐" * pick.stars
+                        console.print(f"  {stars} {pick.selection} ({created})")
+            else:
+                console.print("[yellow]No picks found in database[/yellow]")
+                console.print("[dim]Add picks through the web interface: python quantum_edge.py serve[/dim]")
+            
+            console.print(f"\n[green]✅ Pick Tank verification complete[/green]")
+            
+        except Exception as e:
+            console.print(f"[red]❌ Database error: {e}[/red]")
+        finally:
+            db.close()
+            
+    except Exception as e:
+        console.print(f"[red]❌ Verification error: {e}[/red]")
+
+@app.command()
+def list_picks(date: str = None):
+    """
+    📋 List betting picks for a specific date
+    
+    Shows all picks stored in the Pick Tank for analysis and tracking.
+    
+    Args:
+        date: Date to show picks for (YYYY-MM-DD). Defaults to today.
+    """
+    if not date:
+        date = datetime.now().strftime("%Y-%m-%d")
+    
+    try:
+        # Validate date format
+        datetime.strptime(date, "%Y-%m-%d")
+    except ValueError:
+        console.print("[red]❌ Invalid date format. Use YYYY-MM-DD[/red]")
+        return
+    
+    console.print(f"\n🎯 [bold cyan]Pick Tank - {date}[/bold cyan]\n")
+    
+    # Import here to avoid circular imports
+    from app.db.schema import Pick
+    from app.db.session import SessionLocal
+    
+    db = SessionLocal()
+    try:
+        # Get picks for the date (we'll approximate by created_at date)
+        from datetime import timedelta
+        start_date = datetime.strptime(date, "%Y-%m-%d")
+        end_date = start_date + timedelta(days=1)
+        
+        picks = db.query(Pick).filter(
+            Pick.created_at >= start_date,
+            Pick.created_at < end_date
+        ).order_by(Pick.created_at.desc()).all()
+        
+        if not picks:
+            console.print(f"[yellow]No picks found for {date}[/yellow]")
+            console.print("[dim]Add picks through the web interface: python quantum_edge.py serve[/dim]")
+            return
+        
+        # Group picks by game
+        picks_by_game = {}
+        for pick in picks:
+            if pick.game_pk not in picks_by_game:
+                picks_by_game[pick.game_pk] = []
+            picks_by_game[pick.game_pk].append(pick)
+        
+        total_picks = len(picks)
+        console.print(f"[green]Found {total_picks} pick(s) across {len(picks_by_game)} game(s)[/green]\n")
+        
+        for game_pk, game_picks in picks_by_game.items():
+            console.print(f"[bold]🔷 Game {game_pk}[/bold]")
+            
+            # Create table for this game's picks
+            table = Table(show_header=True, header_style="bold magenta")
+            table.add_column("⭐", style="cyan", width=8)
+            table.add_column("Type", style="yellow", width=8)
+            table.add_column("Market", style="blue", width=20)
+            table.add_column("Selection", style="green", width=25)
+            table.add_column("Odds", style="magenta", width=8)
+            table.add_column("Comment", style="white", width=30)
+            table.add_column("Time", style="dim", width=8)
+            
+            for pick in game_picks:
+                stars = "⭐" * pick.stars
+                comment = (pick.comment[:27] + "...") if pick.comment and len(pick.comment) > 30 else (pick.comment or "")
+                time_str = pick.created_at.strftime("%H:%M") if pick.created_at else ""
+                
+                table.add_row(
+                    stars,
+                    pick.pick_type,
+                    pick.market,
+                    pick.selection,
+                    pick.odds or "",
+                    comment,
+                    time_str
+                )
+            
+            console.print(table)
+            console.print()
+        
+        # Export as JSON option
+        export_data = []
+        for pick in picks:
+            export_data.append({
+                "game_pk": pick.game_pk,
+                "pick_type": pick.pick_type,
+                "market": pick.market,
+                "selection": pick.selection,
+                "odds": pick.odds,
+                "stars": pick.stars,
+                "comment": pick.comment,
+                "created_at": pick.created_at.isoformat() if pick.created_at else None
+            })
+        
+        console.print(f"[dim]💾 Data available as JSON: {json.dumps(export_data, indent=2)}[/dim]")
+        
+    except Exception as e:
+        console.print(f"[red]❌ Error fetching picks: {e}[/red]")
+    finally:
+        db.close()
 
 @app.command()
 def main():
@@ -242,19 +458,20 @@ def main_menu():
     table.add_column("Description", style="green")
 
     commands = [
-        ("1", "pull-teams", "Pull all teams and save them to /data/teams.json."),
-        ("2", "pull-rosters", "Pull full rosters for all teams and save them."),
-        ("3", "pull-player-stats", "Pull advanced stats for all players."),
-        ("4", "view-team", "Show team info and display player list."),
-        ("5", "view-player", "Show full advanced stat report for a player."),
-        ("6", "update-all", "Run all data syncs in order."),
-        ("7", "exit", "Exit the CLI."),
-        ("8", "streaks", "Identify players on hit streaks based on their last 5 games."),
-        ("9", "matchup_report", "Generate a Daily Weak Pitcher Matchup Report."),
-        ("10", "clear_cache", "Clear all cached matchup report data."),
-        ("11", "refresh_report", "Generate matchup report with fresh data (bypass cache)."),
-        ("12", "all-games", "View all games for a date with interactive matchup analysis."),
-        ("13", "update-streaks", "Update hit streak data for all players and cache results."),
+        ("1", "serve", "🌐 Launch Quantum Edge web server."),
+        ("2", "pull-teams", "Pull all teams and save them to /data/teams.json."),
+        ("3", "pull-rosters", "Pull full rosters for all teams and save them."),
+        ("4", "pull-player-stats", "Pull advanced stats for all players."),
+        ("5", "view-team", "Show team info and display player list."),
+        ("6", "view-player", "Show full advanced stat report for a player."),
+        ("7", "update-all", "Run all data syncs in order."),
+        ("8", "exit", "Exit the CLI."),
+        ("9", "streaks", "Identify players on hit streaks based on their last 5 games."),
+        ("10", "matchup_report", "Generate a Daily Weak Pitcher Matchup Report."),
+        ("11", "clear_cache", "Clear all cached matchup report data."),
+        ("12", "refresh_report", "Generate matchup report with fresh data (bypass cache)."),
+        ("13", "all-games", "View all games for a date with interactive matchup analysis."),
+        ("14", "update-streaks", "Update hit streak data for all players and cache results."),
     ]
 
     for command in commands:
@@ -265,36 +482,38 @@ def main_menu():
     while True:
         choice = console.input("[bold cyan]Select a command by number: [/bold cyan]")
         if choice == "1":
-            pull_teams()
+            serve()
         elif choice == "2":
-            pull_rosters()
+            pull_teams()
         elif choice == "3":
-            pull_player_stats()
+            pull_rosters()
         elif choice == "4":
+            pull_player_stats()
+        elif choice == "5":
             team_name = console.input("[bold cyan]Enter team name: [/bold cyan]")
             view_team(team_name)
-        elif choice == "5":
+        elif choice == "6":
             player_name = console.input("[bold cyan]Enter player name: [/bold cyan]")
             view_player(player_name)
-        elif choice == "6":
-            update_all()
         elif choice == "7":
+            update_all()
+        elif choice == "8":
             console.print("[bold green]Exiting Quantum Edge CLI. Goodbye![/bold green]")
             break
-        elif choice == "8":
-            streaks()
         elif choice == "9":
+            streaks()
+        elif choice == "10":
             date = console.input("[bold cyan]Enter date for matchup report (YYYY-MM-DD): [/bold cyan]")
             matchup_report(date=date)
-        elif choice == "10":
-            clear_cache()
         elif choice == "11":
+            clear_cache()
+        elif choice == "12":
             date = console.input("[bold cyan]Enter date for matchup report (YYYY-MM-DD): [/bold cyan]")
             matchup_report(date=date, force_refresh=True)
-        elif choice == "12":
+        elif choice == "13":
             date = console.input("[bold cyan]Enter date for all games report (YYYY-MM-DD): [/bold cyan]")
             all_games(date=date)
-        elif choice == "13":
+        elif choice == "14":
             update_streaks()
         else:
             console.print("[bold red]Invalid choice. Please select a valid command number.[/bold red]")
@@ -1343,6 +1562,44 @@ def refresh_report(date: str = None):
     if not date:
         date = console.input("[bold cyan]Enter date for fresh matchup report (YYYY-MM-DD): [/bold cyan]")
     matchup_report(force_refresh=True, date=date)
+
+@app.command()
+def serve(host: str = "0.0.0.0", port: int = 8000):
+    """Launch Quantum Edge web UI."""
+    import uvicorn
+    import webbrowser
+    import threading
+    import time
+    
+    console.print(f"[bold cyan]🌐 Starting Quantum Edge Web Server...[/bold cyan]")
+    console.print(f"[green]🚀 Server will be available at: http://{host}:{port}[/green]")
+    console.print(f"[yellow]💡 Press Ctrl+C to stop the server[/yellow]\n")
+    
+    # Start server in background thread
+    def run_server():
+        uvicorn.run("app.web_main:app", host=host, port=port, reload=False, log_level="info")
+    
+    server_thread = threading.Thread(target=run_server, daemon=True)
+    server_thread.start()
+    
+    # Wait a moment for server to start
+    time.sleep(2)
+    
+    # Open browser
+    try:
+        webbrowser.open(f"http://{host}:{port}")
+        console.print(f"[green]🌐 Opening browser to http://{host}:{port}[/green]")
+    except Exception as e:
+        console.print(f"[yellow]Could not open browser automatically: {e}[/yellow]")
+        console.print(f"[cyan]Please manually navigate to: http://{host}:{port}[/cyan]")
+    
+    try:
+        # Keep main thread alive
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        console.print(f"\n[red]🛑 Shutting down Quantum Edge Web Server...[/red]")
+        console.print(f"[green]👋 Thanks for using Quantum Edge Analytics![/green]")
 
 @app.command()
 def update_streaks():
