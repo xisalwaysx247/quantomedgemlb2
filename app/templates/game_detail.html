@@ -137,6 +137,7 @@
                         <th>RBI</th>
                         <th>OPS</th>
                         <th>Streak</th>
+                        <th>H2H</th>
                         <th>Impact</th>
                     </tr>
                 </thead>
@@ -162,6 +163,7 @@
                         <td class="rbi">{{ hitter.rbi }}</td>
                         <td class="ops">{{ hitter.ops }}</td>
                         <td class="streak">{{ hitter.streak if hitter.streak != '0' else '-' }}</td>
+                        <td class="h2h">{{ hitter.h2h }}</td>
                         <td class="impact">
                             {% if hitter.tier == "🟢" and loop.index <= 9 %}
                                 <span class="impact-high">High</span>

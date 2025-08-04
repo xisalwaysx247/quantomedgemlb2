@@ -20,6 +20,7 @@ from app.services.mlb_api import (
     fetch_team_roster,
     fetch_games_for_date
 )
+from app.services.h2h import hitter_vs_pitcher_season
 
 # Import database components
 from app.db.schema import Base, Pick
@@ -284,6 +285,12 @@ def build_weak_pitcher_matchups(date: str):
                                 
                                 tier = classify_hitter(hitter_stats)
                                 
+                                # Get H2H stats vs the weak pitcher
+                                pitcher_id = pitcher.get("id")
+                                h2h_stats = "0-0"
+                                if pitcher_id and player_id:
+                                    h2h_stats = hitter_vs_pitcher_season(player_id, pitcher_id, "2025")
+                                
                                 roster.append({
                                     "player_id": player_id,
                                     "name": player_name,
@@ -293,7 +300,8 @@ def build_weak_pitcher_matchups(date: str):
                                     "hr": str(hitter_stats.get("homeRuns", "N/A")),
                                     "rbi": str(hitter_stats.get("rbi", "N/A")),
                                     "ops": safe_format(hitter_stats.get('ops')),
-                                    "streak": str(hit_streak) if hit_streak > 0 else "0"
+                                    "streak": str(hit_streak) if hit_streak > 0 else "0",
+                                    "h2h": h2h_stats
                                 })
                         
                         logger.debug(f"✅ Processed {len(roster)} hitters for {opponent_team}")
@@ -573,7 +581,14 @@ async def single_game_detail(request: Request, game_id: str, date: str = None):
         home_team_id = game_data.get("teams", {}).get("home", {}).get("team", {}).get("id")
         away_team_id = game_data.get("teams", {}).get("away", {}).get("team", {}).get("id")
         
+        # Get pitcher information for H2H stats
+        home_pitcher = game_data.get("home_pitcher", {})
+        away_pitcher = game_data.get("away_pitcher", {})
+        home_pitcher_id = home_pitcher.get("id") if home_pitcher else None
+        away_pitcher_id = away_pitcher.get("id") if away_pitcher else None
+        
         logger.info(f"🏠 Home team ID: {home_team_id}, Away team ID: {away_team_id}")
+        logger.info(f"⚾ Home pitcher ID: {home_pitcher_id}, Away pitcher ID: {away_pitcher_id}")
         
         home_roster = []
         away_roster = []
@@ -609,6 +624,11 @@ async def single_game_detail(request: Request, game_id: str, date: str = None):
                             
                             tier = classify_hitter(hitter_stats)
                             
+                            # Get H2H stats vs the away pitcher
+                            h2h_stats = "0-0"
+                            if away_pitcher_id and player_id:
+                                h2h_stats = hitter_vs_pitcher_season(player_id, away_pitcher_id, "2025")
+                            
                             home_roster.append({
                                 "player_id": player_id,
                                 "name": player_name,
@@ -618,7 +638,8 @@ async def single_game_detail(request: Request, game_id: str, date: str = None):
                                 "hr": str(hitter_stats.get("homeRuns", "N/A")),
                                 "rbi": str(hitter_stats.get("rbi", "N/A")),
                                 "ops": safe_format(hitter_stats.get('ops')),
-                                "streak": str(hit_streak) if hit_streak > 0 else "0"
+                                "streak": str(hit_streak) if hit_streak > 0 else "0",
+                                "h2h": h2h_stats
                             })
                 
                 logger.info(f"✅ Processed {len(home_roster)} home hitters")
@@ -659,6 +680,11 @@ async def single_game_detail(request: Request, game_id: str, date: str = None):
                             
                             tier = classify_hitter(hitter_stats)
                             
+                            # Get H2H stats vs the home pitcher
+                            h2h_stats = "0-0"
+                            if home_pitcher_id and player_id:
+                                h2h_stats = hitter_vs_pitcher_season(player_id, home_pitcher_id, "2025")
+                            
                             away_roster.append({
                                 "player_id": player_id,
                                 "name": player_name,
@@ -668,7 +694,8 @@ async def single_game_detail(request: Request, game_id: str, date: str = None):
                                 "hr": str(hitter_stats.get("homeRuns", "N/A")),
                                 "rbi": str(hitter_stats.get("rbi", "N/A")),
                                 "ops": safe_format(hitter_stats.get('ops')),
-                                "streak": str(hit_streak) if hit_streak > 0 else "0"
+                                "streak": str(hit_streak) if hit_streak > 0 else "0",
+                                "h2h": h2h_stats
                             })
                 
                 logger.info(f"✅ Processed {len(away_roster)} away hitters")

@@ -94,6 +94,7 @@
                         <th>RBI</th>
                         <th>OPS</th>
                         <th>Streak</th>
+                        <th>H2H</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -114,6 +115,7 @@
                         <td class="rbi">{{ hitter.rbi }}</td>
                         <td class="ops">{{ hitter.ops }}</td>
                         <td class="streak">{{ hitter.streak if hitter.streak != '0' else '-' }}</td>
+                        <td class="h2h">{{ hitter.h2h }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -159,6 +161,7 @@
                         <th>RBI</th>
                         <th>OPS</th>
                         <th>Streak</th>
+                        <th>H2H</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -179,6 +182,7 @@
                         <td class="rbi">{{ hitter.rbi }}</td>
                         <td class="ops">{{ hitter.ops }}</td>
                         <td class="streak">{{ hitter.streak if hitter.streak != '0' else '-' }}</td>
+                        <td class="h2h">{{ hitter.h2h }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

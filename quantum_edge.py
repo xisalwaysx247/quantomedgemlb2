@@ -4,6 +4,7 @@ from rich.table import Table
 from rich.panel import Panel
 from app.services.loader import fetch_teams, fetch_roster, fetch_player_stats, fetch_team_stats, fetch_last_5_games
 from app.services.mlb_api import fetch_games_for_date
+from app.services.h2h import hitter_vs_pitcher_season
 from app.db.session import SessionLocal as Session
 from sqlalchemy import text
 from tabulate import tabulate
@@ -888,6 +889,7 @@ def matchup_report(weak_pitchers: bool = False, date: str = None, use_cache: boo
                 hitting_table.add_column("RBI", style="yellow", width=4)
                 hitting_table.add_column("OPS", style="yellow", width=6)
                 hitting_table.add_column("Streak", style="bright_yellow", width=6)
+                hitting_table.add_column("H2H", style="green", width=6)
 
                 # Collect all hitters first
                 all_hitters = []
@@ -921,6 +923,12 @@ def matchup_report(weak_pitchers: bool = False, date: str = None, use_cache: boo
                     
                     tier = classify_hitter(hitter_stats)
                     
+                    # Get H2H stats vs the weak pitcher
+                    pitcher_id = pitcher.get("id")
+                    h2h_stats = "0-0"
+                    if pitcher_id and player_id:
+                        h2h_stats = hitter_vs_pitcher_season(player_id, pitcher_id, "2025")
+                    
                     # Helper function to safely get ERA
                     def get_era_value(stats):
                         era = stats.get('era', 0)
@@ -941,6 +949,7 @@ def matchup_report(weak_pitchers: bool = False, date: str = None, use_cache: boo
                         "rbi": str(hitter_stats.get("rbi", "N/A")),
                         "ops": safe_format(hitter_stats.get('ops')),
                         "streak": str(hit_streak) if hit_streak > 0 else "0",
+                        "h2h": h2h_stats
                     }
                     
                     all_hitters.append(player_row)
@@ -972,7 +981,8 @@ def matchup_report(weak_pitchers: bool = False, date: str = None, use_cache: boo
                         hitter["hr"],
                         hitter["rbi"],
                         hitter["ops"],
-                        hitter["streak"]
+                        hitter["streak"],
+                        hitter["h2h"]
                     )
                     
                     # Count by tier for summary
@@ -1311,6 +1321,7 @@ def all_games(date: str = None, use_cache: bool = True):
                 hitting_table.add_column("RBI", style="yellow", width=4)
                 hitting_table.add_column("OPS", style="yellow", width=6)
                 hitting_table.add_column("Streak", style="bright_yellow", width=6)
+                hitting_table.add_column("H2H", style="green", width=6)
 
                 # Collect all hitters first
                 all_hitters = []
@@ -1344,6 +1355,12 @@ def all_games(date: str = None, use_cache: bool = True):
                     
                     tier = classify_hitter(hitter_stats)
                     
+                    # Get H2H stats vs the pitcher
+                    pitcher_id = pitcher.get("id")
+                    h2h_stats = "0-0"
+                    if pitcher_id and player_id:
+                        h2h_stats = hitter_vs_pitcher_season(player_id, pitcher_id, "2025")
+                    
                     # Helper function to safely get ERA
                     def get_era_value(stats):
                         era = stats.get('era', 0)
@@ -1364,6 +1381,7 @@ def all_games(date: str = None, use_cache: bool = True):
                         "rbi": str(hitter_stats.get("rbi", "N/A")),
                         "ops": safe_format(hitter_stats.get('ops')),
                         "streak": str(hit_streak) if hit_streak > 0 else "0",
+                        "h2h": h2h_stats
                     }
                     
                     all_hitters.append(player_row)
@@ -1395,7 +1413,8 @@ def all_games(date: str = None, use_cache: bool = True):
                         hitter["hr"],
                         hitter["rbi"],
                         hitter["ops"],
-                        hitter["streak"]
+                        hitter["streak"],
+                        hitter["h2h"]
                     )
                     
                     # Count by tier for summary
