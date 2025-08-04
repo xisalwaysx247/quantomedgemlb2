@@ -200,6 +200,23 @@ def get_team_roster(team_id: int):
         logger.error(f"Error getting team roster {team_id}: {e}")
         return None, None
 
+def clean_team_name(team_name):
+    """Clean team name to remove location and keep just the team name"""
+    if not team_name or team_name == "Unknown":
+        return team_name
+    
+    # Common location prefixes to remove
+    locations_to_remove = [
+        "Los Angeles", "San Francisco", "San Diego", "New York", 
+        "St. Louis", "Kansas City", "Tampa Bay", "Washington"
+    ]
+    
+    for location in locations_to_remove:
+        if team_name.startswith(location):
+            return team_name.replace(location, "").strip()
+    
+    return team_name
+
 def build_weak_pitcher_matchups(date: str):
     """Build weak pitcher matchup data for web display (simplified)"""
     try:
@@ -210,10 +227,14 @@ def build_weak_pitcher_matchups(date: str):
         weak_pitcher_games = []
         
         for game in games:
-            home_team = game.get("teams", {}).get("home", {}).get("team", {}).get("name", "Unknown")
-            away_team = game.get("teams", {}).get("away", {}).get("team", "Unknown")
+            home_team_raw = game.get("teams", {}).get("home", {}).get("team", {}).get("name", "Unknown")
+            away_team_raw = game.get("teams", {}).get("away", {}).get("team", {}).get("name", "Unknown")
+            home_team = clean_team_name(home_team_raw)
+            away_team = clean_team_name(away_team_raw)
             home_team_id = game.get("teams", {}).get("home", {}).get("team", {}).get("id")
             away_team_id = game.get("teams", {}).get("away", {}).get("team", {}).get("id")
+            
+            logger.debug(f"🏟️ Processing game: {away_team} @ {home_team}")
             
             home_pitcher = game.get("home_pitcher", {})
             away_pitcher = game.get("away_pitcher", {})
@@ -224,32 +245,42 @@ def build_weak_pitcher_matchups(date: str):
                 ("home_pitcher", away_team_id, home_team, away_team),
                 ("away_pitcher", home_team_id, away_team, home_team)
             ]:
-                pitcher = game.get(pitcher_key, {})
-                pitcher_name = pitcher.get("fullName", "Unknown")
-                
-                if pitcher_name != "TBD" and pitcher and is_weak_pitcher(pitcher.get("stats", {})):
-                    # Simplified - just get basic roster data for display
-                    roster_data = fetch_team_roster(opponent_team_id)
-                    roster = []
+                try:
+                    pitcher = game.get(pitcher_key, {})
+                    pitcher_name = pitcher.get("fullName", "Unknown")
                     
-                    if roster_data:
+                    logger.debug(f"🔍 Checking pitcher: {pitcher_name} ({pitcher_team})")
+                    
+                    if pitcher_name != "TBD" and pitcher and is_weak_pitcher(pitcher.get("stats", {})):
+                        logger.info(f"⚠️ Weak pitcher found: {pitcher_name} ({pitcher_team})")
+                        
+                        # Use same robust processing as all games pages
+                        roster_data = fetch_team_roster(opponent_team_id)
+                        roster = []
+                        
+                        if roster_data:
+                            logger.debug(f"🔍 Processing {len(roster_data)} players for {opponent_team} vs weak pitcher {pitcher_name}")
+                        
                         for player in roster_data:
                             position = player.get("position", {}).get("abbreviation", "")
                             if position != "P":  # Only hitters
                                 player_id = player.get("person", {}).get("id")
                                 player_name = player.get("person", {}).get("fullName", "Unknown")
                                 
-                                # Get basic stats
+                                logger.debug(f"🔍 Processing player: {player_name} (ID: {player_id})")
+                                
+                                # Use same robust stats processing as all games
                                 hitter_stats = {}
                                 hit_streak = 0
                                 try:
                                     player_file = os.path.join("data", "players", f"{player_id}.json")
                                     if os.path.exists(player_file):
                                         with open(player_file, "r") as f:
-                                            hitter_stats = json.load(f)
+                                            player_data = json.load(f)
+                                            hitter_stats = player_data
                                     hit_streak = get_hit_streak(player_id) if player_id else 0
-                                except:
-                                    pass
+                                except Exception as e:
+                                    logger.debug(f"Could not get stats for player {player_name}: {e}")
                                 
                                 tier = classify_hitter(hitter_stats)
                                 
@@ -259,13 +290,15 @@ def build_weak_pitcher_matchups(date: str):
                                     "position": position,
                                     "tier": tier,
                                     "avg": safe_format(hitter_stats.get('avg')),
-                                    "hr": str(hitter_stats.get("homeRuns", "0")),
-                                    "rbi": str(hitter_stats.get("rbi", "0")),
+                                    "hr": str(hitter_stats.get("homeRuns", "N/A")),
+                                    "rbi": str(hitter_stats.get("rbi", "N/A")),
                                     "ops": safe_format(hitter_stats.get('ops')),
                                     "streak": str(hit_streak) if hit_streak > 0 else "0"
                                 })
                         
-                        # Sort by batting average
+                        logger.debug(f"✅ Processed {len(roster)} hitters for {opponent_team}")
+                        
+                        # Sort by batting average - same as all games
                         def sort_key(hitter):
                             try:
                                 avg_value = float(hitter["avg"]) if hitter["avg"] != "N/A" else 0.0
@@ -275,61 +308,73 @@ def build_weak_pitcher_matchups(date: str):
                             return (-avg_value, tier_priority.get(hitter["tier"], 4))
                         
                         roster.sort(key=sort_key)
-                    
-                    # Calculate basic stats for display
-                    if roster:
-                        strong_count = sum(1 for h in roster if h["tier"] == "🟢")
-                        bubble_count = sum(1 for h in roster if h["tier"] == "🟡") 
-                        weak_count = sum(1 for h in roster if h["tier"] == "🔴")
-                        total = len(roster)
                         
-                        strong_pct = f"{(strong_count/total*100):.1f}" if total > 0 else "0.0"
-                        bubble_pct = f"{(bubble_count/total*100):.1f}" if total > 0 else "0.0"
-                        weak_pct = f"{(weak_count/total*100):.1f}" if total > 0 else "0.0"
-                        
-                        # Simple recommendation
-                        lineup_strong_pct = float(strong_pct)
-                        if len(roster) >= 9:
-                            top_9_strong = sum(1 for h in roster[:9] if h["tier"] == "🟢")
-                            lineup_strong_pct = (top_9_strong/9*100)
-                        
-                        if lineup_strong_pct > 30:
-                            recommendation = {
-                                "type": "excellent",
-                                "icon": "💰",
-                                "text": f"EXCELLENT OPPORTUNITY: {lineup_strong_pct:.1f}% strong hitters vs weak pitcher!"
-                            }
-                        elif lineup_strong_pct > 15:
-                            recommendation = {
-                                "type": "good", 
-                                "icon": "⚡",
-                                "text": f"GOOD OPPORTUNITY: {lineup_strong_pct:.1f}% strong hitters vs weak pitcher!"
-                            }
+                        # Calculate comprehensive stats - same as all games
+                        if roster:
+                            total = len(roster)
+                            strong_count = sum(1 for h in roster if h["tier"] == "🟢")
+                            bubble_count = sum(1 for h in roster if h["tier"] == "🟡") 
+                            weak_count = sum(1 for h in roster if h["tier"] == "🔴")
+                            
+                            strong_pct = f"{(strong_count/total*100):.1f}" if total > 0 else "0.0"
+                            bubble_pct = f"{(bubble_count/total*100):.1f}" if total > 0 else "0.0"
+                            weak_pct = f"{(weak_count/total*100):.1f}" if total > 0 else "0.0"
+                            
+                            # Enhanced recommendation logic - same as all games
+                            lineup_strong_pct = float(strong_pct)
+                            if len(roster) >= 9:
+                                top_9_strong = sum(1 for h in roster[:9] if h["tier"] == "🟢")
+                                lineup_strong_pct = (top_9_strong/9*100)
+                            
+                            if lineup_strong_pct > 30:
+                                recommendation = {
+                                    "type": "excellent",
+                                    "icon": "💰",
+                                    "text": f"EXCELLENT OPPORTUNITY: {lineup_strong_pct:.1f}% strong hitters vs weak pitcher!"
+                                }
+                            elif lineup_strong_pct > 15:
+                                recommendation = {
+                                    "type": "good", 
+                                    "icon": "⚡",
+                                    "text": f"GOOD OPPORTUNITY: {lineup_strong_pct:.1f}% strong hitters vs weak pitcher!"
+                                }
+                            else:
+                                recommendation = {
+                                    "type": "limited",
+                                    "icon": "📋", 
+                                    "text": "LIMITED OPPORTUNITY: Mostly weak lineup vs weak pitcher"
+                                }
+                            
+                            logger.info(f"✅ {opponent_team} vs {pitcher_name}: {strong_count}🟢 {bubble_count}🟡 {weak_count}🔴")
                         else:
-                            recommendation = {
-                                "type": "limited",
-                                "icon": "📋", 
-                                "text": "LIMITED OPPORTUNITY: Mostly weak lineup vs weak pitcher"
-                            }
-                    else:
-                        strong_count = bubble_count = weak_count = 0
-                        strong_pct = bubble_pct = weak_pct = "0.0"
-                        recommendation = None
+                            strong_count = bubble_count = weak_count = 0
+                            strong_pct = bubble_pct = weak_pct = "0.0"
+                            recommendation = None
+                            logger.warning(f"⚠️ No roster data for {opponent_team}")
+                        
+                        weak_pitchers_found.append({
+                            "pitcher": {
+                                **pitcher,
+                                "stats": pitcher.get("stats", {})  # Ensure stats key always exists
+                            },
+                            "pitcher_team": pitcher_team,
+                            "opponent_team": opponent_team,
+                            "opponent_team_id": opponent_team_id,
+                            "roster": roster,
+                            "strong_count": strong_count,
+                            "bubble_count": bubble_count,
+                            "weak_count": weak_count,
+                            "strong_pct": strong_pct,
+                            "bubble_pct": bubble_pct,
+                            "weak_pct": weak_pct,
+                            "recommendation": recommendation
+                        })
                     
-                    weak_pitchers_found.append({
-                        "pitcher": pitcher,
-                        "pitcher_team": pitcher_team,
-                        "opponent_team": opponent_team,
-                        "opponent_team_id": opponent_team_id,
-                        "roster": roster,
-                        "strong_count": strong_count,
-                        "bubble_count": bubble_count,
-                        "weak_count": weak_count,
-                        "strong_pct": strong_pct,
-                        "bubble_pct": bubble_pct,
-                        "weak_pct": weak_pct,
-                        "recommendation": recommendation
-                    })
+                except Exception as e:
+                    logger.error(f"❌ Error processing pitcher {pitcher_key} for game {game.get('gamePk', 'Unknown')}: {e}")
+                    import traceback
+                    logger.error(f"Pitcher processing traceback: {traceback.format_exc()}")
+                    continue
             
             if weak_pitchers_found:
                 weak_pitcher_games.append({
@@ -338,7 +383,9 @@ def build_weak_pitcher_matchups(date: str):
                     "away_team": away_team,
                     "weak_pitchers": weak_pitchers_found
                 })
+                logger.info(f"✅ Added game with {len(weak_pitchers_found)} weak pitcher(s): {away_team} @ {home_team}")
         
+        logger.info(f"🎯 Found {len(weak_pitcher_games)} games with weak pitchers")
         return weak_pitcher_games
         
     except Exception as e:
@@ -426,8 +473,10 @@ async def all_games_page(request: Request, date: str = None):
     enhanced_games = []
     for game in games:
         game_pk = game.get("gamePk")
-        home_team = game.get("teams", {}).get("home", {}).get("team", {}).get("name", "Unknown")
-        away_team = game.get("teams", {}).get("away", {}).get("team", {}).get("name", "Unknown")
+        home_team_raw = game.get("teams", {}).get("home", {}).get("team", {}).get("name", "Unknown")
+        away_team_raw = game.get("teams", {}).get("away", {}).get("team", {}).get("name", "Unknown")
+        home_team = clean_team_name(home_team_raw)
+        away_team = clean_team_name(away_team_raw)
         
         # Get game status and time
         status = game.get("status", {})
@@ -515,8 +564,10 @@ async def single_game_detail(request: Request, game_id: str, date: str = None):
         logger.info(f"✅ Found game: {game_data.get('teams', {}).get('away', {}).get('team', {}).get('name', 'Unknown')} @ {game_data.get('teams', {}).get('home', {}).get('team', {}).get('name', 'Unknown')}")
         
         # Enhanced game data processing
-        home_team = game_data.get("teams", {}).get("home", {}).get("team", {}).get("name", "Unknown")
-        away_team = game_data.get("teams", {}).get("away", {}).get("team", {}).get("name", "Unknown")
+        home_team_raw = game_data.get("teams", {}).get("home", {}).get("team", {}).get("name", "Unknown")
+        away_team_raw = game_data.get("teams", {}).get("away", {}).get("team", {}).get("name", "Unknown")
+        home_team = clean_team_name(home_team_raw)
+        away_team = clean_team_name(away_team_raw)
         
         # Get detailed team rosters for both teams - CLI style
         home_team_id = game_data.get("teams", {}).get("home", {}).get("team", {}).get("id")
@@ -778,6 +829,21 @@ async def get_player_data(player_id: int):
         logger.error(f"Full traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail="Error fetching player data")
 
+# Player Route (for handling direct navigation attempts)
+@app.get("/player/{player_id}", response_class=HTMLResponse)
+async def player_redirect(request: Request, player_id: int):
+    """Handle direct player navigation by redirecting back with modal trigger"""
+    # Get the referer URL to redirect back to the original page
+    referer = request.headers.get("referer", "/")
+    
+    # Add player parameter to the referer URL
+    if "?" in referer:
+        redirect_url = f"{referer}&player={player_id}"
+    else:
+        redirect_url = f"{referer}?player={player_id}"
+    
+    return RedirectResponse(url=redirect_url, status_code=302)
+
 # Pick Tank Routes
 @app.get("/pick-tank", response_class=HTMLResponse)
 async def pick_tank_index(request: Request, date: str = None):
@@ -823,8 +889,10 @@ async def pick_tank_index(request: Request, date: str = None):
     enhanced_games = []
     for game in games:
         game_pk = game.get("gamePk")
-        home_team = game.get("teams", {}).get("home", {}).get("team", {}).get("name", "Unknown")
-        away_team = game.get("teams", {}).get("away", {}).get("team", {}).get("name", "Unknown")
+        home_team_raw = game.get("teams", {}).get("home", {}).get("team", {}).get("name", "Unknown")
+        away_team_raw = game.get("teams", {}).get("away", {}).get("team", {}).get("name", "Unknown")
+        home_team = clean_team_name(home_team_raw)
+        away_team = clean_team_name(away_team_raw)
         
         enhanced_games.append({
             "game_pk": game_pk,
@@ -852,8 +920,10 @@ async def pick_tank_new_form(request: Request, game_pk: int):
         
         for game in games:
             if game.get("gamePk") == game_pk:
-                home_team = game.get("teams", {}).get("home", {}).get("team", {}).get("name", "Unknown")
-                away_team = game.get("teams", {}).get("away", {}).get("team", {}).get("name", "Unknown")
+                home_team_raw = game.get("teams", {}).get("home", {}).get("team", {}).get("name", "Unknown")
+                away_team_raw = game.get("teams", {}).get("away", {}).get("team", {}).get("name", "Unknown")
+                home_team = clean_team_name(home_team_raw)
+                away_team = clean_team_name(away_team_raw)
                 home_team_id = game.get("teams", {}).get("home", {}).get("team", {}).get("id")
                 away_team_id = game.get("teams", {}).get("away", {}).get("team", {}).get("id")
                 
